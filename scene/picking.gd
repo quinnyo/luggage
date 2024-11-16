@@ -17,6 +17,10 @@ func has_object_3d() -> bool:
 	return object != null
 
 
+func get_object() -> Node:
+	return object
+
+
 func get_intersection_point_3d() -> Vector3:
 	return position
 

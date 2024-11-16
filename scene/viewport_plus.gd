@@ -1,7 +1,12 @@
 class_name ViewportPlus extends Viewport
 
 
+var _selection: Selection = Selection.new()
 var _picking: Picking = Picking.new()
+
+
+func get_selection() -> Selection:
+	return _selection
 
 
 func get_picking() -> Picking:
