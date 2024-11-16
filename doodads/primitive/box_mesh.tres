@@ -1,0 +1,6 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://dlkrwid7hpdxk"]
+
+[ext_resource type="Material" uid="uid://ccqq7es51cdmw" path="res://doodads/primitive/primitive_pink.material" id="1_8p06r"]
+
+[resource]
+material = ExtResource("1_8p06r")

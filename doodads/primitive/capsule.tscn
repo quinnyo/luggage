@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbl3hghyw1kot"]
+
+[ext_resource type="CapsuleMesh" uid="uid://bo1bmu1rl0d4h" path="res://doodads/primitive/capsule_mesh.tres" id="1_capb1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uersb"]
+
+[node name="Capsule" type="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_uersb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
+mesh = ExtResource("1_capb1")

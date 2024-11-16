@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3 uid="uid://vwnfdda1f5y4"]
+
+[ext_resource type="Script" path="res://scene/test/hello_viewport.gd" id="1_1p5wg"]
+[ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="2_257j4"]
+[ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="3_h6sx6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6er5x"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_awqd3"]
+albedo_color = Color(0.572569, 0.563147, 0.461671, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jptgh"]
+material = SubResource("StandardMaterial3D_awqd3")
+size = Vector3(20, 1, 20)
+
+[node name="HelloViewport" type="Node3D"]
+script = ExtResource("1_1p5wg")
+
+[node name="Capsule" parent="." instance=ExtResource("2_257j4")]
+transform = Transform3D(0.298191, 0.903249, 0.308582, -0.954506, 0.282178, 0.0964022, 0, -0.32329, 0.9463, 0, 1.61647, 0)
+
+[node name="Box" parent="." instance=ExtResource("3_h6sx6")]
+transform = Transform3D(0.993615, -0.061081, 0.094861, 0.0815874, 0.969723, -0.230177, -0.0779294, 0.236447, 0.968514, 0, 2.86151, -0.130641)
+
+[node name="Floor" type="StaticBody3D" parent="."]
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_6er5x")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor/CollisionShape3D"]
+mesh = SubResource("BoxMesh_jptgh")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.872607, 0.103399, 0.477353, -0.488423, 0.184731, 0.852829, 0, -0.977335, 0.2117, 0, 19.2023, 0)
+light_color = Color(0.961266, 0.953814, 0.945111, 1)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.891007, 0.420933, -0.170068, 0, 0.374607, 0.927184, 0.453991, -0.826127, 0.333777, -2.714, 11.158, 6.219)
+fov = 54.0
+far = 500.0
