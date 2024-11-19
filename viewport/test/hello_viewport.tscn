@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://vwnfdda1f5y4"]
 
-[ext_resource type="Script" path="res://scene/test/hello_viewport.gd" id="1_1p5wg"]
+[ext_resource type="Script" path="res://viewport/test/hello_viewport.gd" id="1_1p5wg"]
 [ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="2_257j4"]
 [ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="3_h6sx6"]
 
