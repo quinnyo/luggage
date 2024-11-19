@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://vwnfdda1f5y4"]
+[gd_scene load_steps=8 format=3 uid="uid://vwnfdda1f5y4"]
 
 [ext_resource type="Script" path="res://viewport/test/hello_viewport.gd" id="1_1p5wg"]
 [ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="2_257j4"]
 [ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="3_h6sx6"]
+[ext_resource type="Script" path="res://viewport/camera/camera_plus_3d.gd" id="4_vwroj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6er5x"]
 size = Vector3(20, 1, 20)
@@ -38,7 +39,21 @@ transform = Transform3D(0.872607, 0.103399, 0.477353, -0.488423, 0.184731, 0.852
 light_color = Color(0.961266, 0.953814, 0.945111, 1)
 shadow_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.891007, 0.420933, -0.170068, 0, 0.374607, 0.927184, 0.453991, -0.826127, 0.333777, -2.714, 11.158, 6.219)
+[node name="Camera3D" type="Camera3D" parent="." groups=["CameraPlus3D"]]
+transform = Transform3D(0.965926, -0.12941, 0.224144, 0, 0.866025, 0.5, -0.258819, -0.482963, 0.836516, 4.03459, 9, 15.0573)
+top_level = true
 fov = 54.0
 far = 500.0
+script = ExtResource("4_vwroj")
+view_mode = 1
+orbit_longitude = 0.261799
+orbit_altitude = 18.0
+
+[node name="ItemCamera" type="Camera3D" parent="." groups=["CameraPlus3D"]]
+unique_name_in_owner = true
+transform = Transform3D(0.707107, -0.612372, 0.353553, 0, 0.5, 0.866025, -0.707107, -0.612372, 0.353553, 1.76777, 4.33013, 1.76777)
+top_level = true
+script = ExtResource("4_vwroj")
+view_mode = 1
+orbit_latitude = 1.0472
+orbit_altitude = 5.0

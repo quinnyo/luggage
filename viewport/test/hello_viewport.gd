@@ -8,6 +8,16 @@ const Pointer3D := preload("res://doodads/utility/pointer_3d.tscn")
 var vpp: ViewportPlus
 
 
+func _on_selection_changed() -> void:
+	var selected := vpp.get_selection().get_selected_nodes()
+	var new_target: Node3D = null
+	for node in selected:
+		if node is Node3D:
+			new_target = node as Node3D
+			break
+	%ItemCamera.target_node = new_target
+
+
 func _ready() -> void:
 	add_child(pointer_3d)
 	add_child(selection_pointer_3d)
@@ -15,6 +25,8 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	vpp = ViewportPlus.get_viewport_plus(self)
+	var selection := vpp.get_selection()
+	selection.selection_changed.connect(_on_selection_changed)
 
 
 func _exit_tree() -> void:
@@ -44,3 +56,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				var selection := vpp.get_selection()
 				selection.clear()
 				selection.add_node(vpp.get_picking().get_object())
+	elif event is InputEventKey:
+		if event.pressed && event.key_label == KEY_V:
+			%ItemCamera.current = !%ItemCamera.current
