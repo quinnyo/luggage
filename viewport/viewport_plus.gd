@@ -1,5 +1,8 @@
 class_name ViewportPlus extends Viewport
 
+signal camera_3d_changed()
+
+var _camera_3d: Camera3D
 
 var _selection: Selection = Selection.new()
 var _picking: Picking = Picking.new()
@@ -27,3 +30,10 @@ static func get_viewport_plus(node: Node) -> ViewportPlus:
 
 func _ready() -> void:
 	add_child(_picking)
+
+
+func _process(_delta: float) -> void:
+	var cam := get_camera_3d()
+	if cam != _camera_3d:
+		_camera_3d = cam
+		camera_3d_changed.emit()
