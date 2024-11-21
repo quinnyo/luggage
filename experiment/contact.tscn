@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://0rd3q2xfg8hj"]
+
+[ext_resource type="Script" path="res://experiment/contact_inspector.gd" id="1_x3xsl"]
+[ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="2_0hsjs"]
+[ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="3_8g2sl"]
+[ext_resource type="Script" path="res://viewport/camera/camera_plus_3d.gd" id="4_5o5ff"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n0y50"]
+transparency = 1
+no_depth_test = true
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.907942, 0.907942, 0.907942, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3y6no"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kmlw1"]
+size = Vector3(20, 1, 20)
+
+[node name="ContactInspector" type="Node3D" node_paths=PackedStringArray("camera", "watch_object")]
+script = ExtResource("1_x3xsl")
+base_material = SubResource("StandardMaterial3D_n0y50")
+camera = NodePath("CameraPlus3D")
+watch_object = NodePath("Box")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_3y6no")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+mesh = SubResource("BoxMesh_kmlw1")
+
+[node name="Box" parent="." instance=ExtResource("2_0hsjs")]
+transform = Transform3D(0.820282, 0.57196, 0, -0.57196, 0.820282, 0, 0, 0, 1, -0.653623, 5.21809, -0.810649)
+contact_monitor = true
+max_contacts_reported = 30
+linear_velocity = Vector3(0, -10, 0)
+
+[node name="Capsule" parent="." instance=ExtResource("3_8g2sl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.34376, 1.5, -0.807365)
+
+[node name="CameraPlus3D" type="Camera3D" parent="." node_paths=PackedStringArray("target_node") groups=["CameraPlus3D"]]
+process_mode = 3
+transform = Transform3D(0.939693, -0.0593912, 0.336824, 0, 0.984808, 0.173648, -0.34202, -0.163176, 0.925417, 0.356849, 5.73904, 1.9656)
+top_level = true
+fov = 50.0
+script = ExtResource("4_5o5ff")
+view_mode = 1
+orbit_latitude = 0.174533
+orbit_longitude = 0.349066
+orbit_altitude = 3.0
+target_node = NodePath("../Box")
+process_callback = 1
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, -0.453154, -0.422618, 0.784886, 0.211309, -0.906308, -0.365998, 0, 15, 0)
