@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://dnd070cb38qvy"]
+
+[ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="1_jk3se"]
+[ext_resource type="Script" path="res://item/item_body.gd" id="2_4mn7g"]
+
+[node name="Capsule" instance=ExtResource("1_jk3se")]
+contact_monitor = true
+script = ExtResource("2_4mn7g")

@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://j117yt8dhntu"]
+
+[ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="1_oal5c"]
+[ext_resource type="Script" path="res://item/item_body.gd" id="2_w1bqb"]
+
+[node name="Box" instance=ExtResource("1_oal5c")]
+script = ExtResource("2_w1bqb")
