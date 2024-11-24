@@ -14,6 +14,32 @@ var local_shape: int
 var local_velocity_at_position: Vector3
 
 
+func get_relative_velocity_at_position() -> Vector3:
+	return local_velocity_at_position - collider_velocity_at_position
+
+
+func is_equal_approx(other: ContactInfo) -> bool:
+	if collider != other.collider || collider_id != other.collider_id:
+		return false
+	if collider_shape != other.collider_shape:
+		return false
+	if local_shape != other.local_shape:
+		return false
+	if !collider_position.is_equal_approx(other.collider_position):
+		return false
+	if !collider_velocity_at_position.is_equal_approx(other.collider_velocity_at_position):
+		return false
+	if !impulse.is_equal_approx(other.impulse):
+		return false
+	if !local_normal.is_equal_approx(other.local_normal):
+		return false
+	if !local_position.is_equal_approx(other.local_position):
+		return false
+	if !local_velocity_at_position.is_equal_approx(other.local_velocity_at_position):
+		return false
+	return true
+
+
 static func from_state(state: PhysicsDirectBodyState3D, idx: int) -> ContactInfo:
 	var ct := ContactInfo.new()
 	ct.collider = state.get_contact_collider(idx)
