@@ -1,0 +1,105 @@
+[gd_scene load_steps=13 format=3 uid="uid://kn6d6dr35hhi"]
+
+[ext_resource type="Script" path="res://experiment/factory_test/spawn_point.gd" id="1_vuor0"]
+[ext_resource type="PackedScene" uid="uid://j117yt8dhntu" path="res://experiment/item_box.tscn" id="2_uh4kg"]
+[ext_resource type="Script" path="res://item/item_factory_simple.gd" id="3_m7koy"]
+[ext_resource type="PackedScene" uid="uid://88rakp3dqwo6" path="res://doodads/utility/pointer_3d.tscn" id="4_nfi8t"]
+
+[sub_resource type="Resource" id="Resource_ifwfi"]
+script = ExtResource("3_m7koy")
+body_scn = ExtResource("2_uh4kg")
+body_translation = Vector3(0, 0, 0)
+body_rotation = Vector3(0, 0, 0)
+body_rotation_order = 2
+
+[sub_resource type="Resource" id="Resource_qjnrx"]
+script = ExtResource("3_m7koy")
+body_scn = ExtResource("2_uh4kg")
+body_translation = Vector3(0, 0, 0)
+body_rotation = Vector3(0, 0, 0)
+body_rotation_order = 2
+
+[sub_resource type="Resource" id="Resource_a5tso"]
+script = ExtResource("3_m7koy")
+body_scn = ExtResource("2_uh4kg")
+body_translation = Vector3(0, 0, 0)
+body_rotation = Vector3(0, 0, 0)
+body_rotation_order = 2
+
+[sub_resource type="Resource" id="Resource_po0ih"]
+script = ExtResource("3_m7koy")
+body_scn = ExtResource("2_uh4kg")
+body_translation = Vector3(0, 0, 4)
+body_rotation = Vector3(0, 0, 0)
+body_rotation_order = 2
+
+[sub_resource type="Resource" id="Resource_a4vjs"]
+script = ExtResource("3_m7koy")
+body_scn = ExtResource("2_uh4kg")
+body_translation = Vector3(0, 2, 0)
+body_rotation = Vector3(0, 45, 0)
+body_rotation_order = 2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_67qh5"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1xqdl"]
+albedo_color = Color(0.291033, 0.271001, 0.24349, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_auohk"]
+material = SubResource("StandardMaterial3D_1xqdl")
+size = Vector3(20, 1, 20)
+
+[node name="FactoryTest" type="Node3D"]
+
+[node name="BoxSpawnPoint" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, 0)
+script = ExtResource("1_vuor0")
+factory = SubResource("Resource_ifwfi")
+
+[node name="Pointer3D" parent="BoxSpawnPoint" instance=ExtResource("4_nfi8t")]
+
+[node name="BoxSpawnPoint2" type="Node3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -6, 4, 0)
+script = ExtResource("1_vuor0")
+factory = SubResource("Resource_qjnrx")
+
+[node name="Pointer3D" parent="BoxSpawnPoint2" instance=ExtResource("4_nfi8t")]
+
+[node name="BoxSpawnPoint3" type="Node3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, -4, 4, 0)
+script = ExtResource("1_vuor0")
+factory = SubResource("Resource_a5tso")
+
+[node name="Pointer3D" parent="BoxSpawnPoint3" instance=ExtResource("4_nfi8t")]
+
+[node name="BoxSpawnPoint4" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 0)
+script = ExtResource("1_vuor0")
+factory = SubResource("Resource_po0ih")
+linear_velocity = Vector3(0, 5, 0)
+angular_velocity = Vector3(6.29, 3.142, 0)
+
+[node name="Pointer3D" parent="BoxSpawnPoint4" instance=ExtResource("4_nfi8t")]
+
+[node name="BoxSpawnPoint5" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, 0)
+script = ExtResource("1_vuor0")
+factory = SubResource("Resource_a4vjs")
+
+[node name="Pointer3D" parent="BoxSpawnPoint5" instance=ExtResource("4_nfi8t")]
+
+[node name="floor" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_67qh5")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="floor/CollisionShape3D"]
+mesh = SubResource("BoxMesh_auohk")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 7, 10)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.12941, -0.482963, 0.5, 0.224144, 0.836516, 0, -0.965926, 0.258819, 0, 11, 0)
