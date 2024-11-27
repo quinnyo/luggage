@@ -91,6 +91,14 @@ func get_sample_at(field: int, t: int) -> Variant:
 	return get_sample(field, idx)
 
 
+func get_all_samples(field: int) -> Array:
+	return _samples[field]
+
+
+func get_all_times(field: int) -> PackedInt64Array:
+	return _times[field]
+
+
 func _field_compare(a: Variant, b: Variant, field: int) -> bool:
 	if _field_compare_func.has(field):
 		return _field_compare_func[field].call(a, b)
