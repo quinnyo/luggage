@@ -1,6 +1,7 @@
 extends Node3D
 
 
+@export var enable: bool = true
 @export var tag: String = ""
 @export var factory: ItemFactory
 
