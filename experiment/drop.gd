@@ -90,3 +90,10 @@ func _physics_process(_delta: float) -> void:
 	frame += 1
 	if frame > MAX_FRAMES:
 		stop()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var kev := event as InputEventKey
+	if kev.keycode == KEY_ESCAPE && kev.pressed:
+		print("stopping... (ESC)")
+		stop()
