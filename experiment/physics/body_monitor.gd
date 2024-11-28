@@ -20,8 +20,7 @@ enum Field {
 
 	CONTACTS,
 
-	SUM_CONTACT_IMPULSE,
-	IMPACT,
+	SHOCK,
 }
 
 
@@ -34,13 +33,11 @@ var target: RID
 var frame: int = 0
 var samplon: Samplon
 var _label: Label3D
-var _sum_impact: float
-var _sum_impact_ang: float
+var _sum_shock: float
 
 
 func start() -> void:
-	_sum_impact = 0.0
-	_sum_impact_ang = 0.0
+	_sum_shock = 0.0
 	if not _label:
 		_label = Label3D.new()
 		_label.fixed_size = true
@@ -56,6 +53,8 @@ func start() -> void:
 	_label.text = ""
 	if target_node:
 		target = target_node.get_rid()
+		if target_node is ItemBody:
+			target_node.shock_received.connect(_on_target_shock_received)
 	if !target.is_valid():
 		return
 	frame = 0
@@ -76,12 +75,6 @@ func sample(state: PhysicsDirectBodyState3D) -> void:
 	var contacts := ContactInfo.all_from_state(state)
 	samplon.append_sample(Field.CONTACTS, frame, contacts)
 
-	var sum_impulse := Vector3.ZERO
-	for ct in contacts:
-		sum_impulse += ct.impulse
-	samplon.append_sample(Field.SUM_CONTACT_IMPULSE, frame, sum_impulse)
-
-
 
 func _contacts_compare(a: Array[ContactInfo], b: Array[ContactInfo]) -> bool:
 	if a.size() != b.size():
@@ -92,14 +85,17 @@ func _contacts_compare(a: Array[ContactInfo], b: Array[ContactInfo]) -> bool:
 	return true
 
 
+func _on_target_shock_received(s: float) -> void:
+	_sum_shock += s
+	samplon.append_sample(Field.SHOCK, frame, s)
+	if _label:
+		_label.text = "%3.1f (+%3.1f)" % [ _sum_shock, s ]
+		var state := PhysicsServer3D.body_get_direct_state(target)
+		_label.global_position = state.transform.origin
+
+
 func _physics_process(_delta: float) -> void:
 	if rolling && target.is_valid():
 		var state := PhysicsServer3D.body_get_direct_state(target)
 		sample(state)
-		if target_node is ItemBody && target_node.impact > 0.0:
-			samplon.append_sample(Field.IMPACT, frame, target_node.impact)
-			_sum_impact += target_node.impact
-		if _label:
-			_label.text = "%3.1f" % [ _sum_impact ]
-			_label.global_position = state.transform.origin
 		frame += 1

@@ -28,24 +28,22 @@ func stop() -> void:
 	rolling = false
 	print("STOP @ %d" % [ frame ])
 
-	var samp := monitors[0].samplon
-	print("samplon t[%d .. %d]" % [ samp.get_start_time(), samp.get_end_time() ])
-	for field in range(samp.get_field_count()):
-		var field_name := samp.get_field_id(field)
-		var nsamples := samp.get_sample_count(field)
-		var t_range := ""
-		if nsamples == 1:
-			t_range = " @ t=%d" % [ samp.get_sample_time(field, 0) ]
-		elif nsamples > 1:
-			var field_t_start := samp.get_sample_time(field, 0)
-			var field_t_end := samp.get_sample_time(field, -1)
-			t_range = " @ t[%d .. %d]" % [ field_t_start, field_t_end ]
-		print("  %22s: %d" % [ field_name, nsamples ], t_range )
+	#var samp := monitors[0].samplon
+	#print("samplon t[%d .. %d]" % [ samp.get_start_time(), samp.get_end_time() ])
+	#for field in range(samp.get_field_count()):
+		#var field_name := samp.get_field_id(field)
+		#var nsamples := samp.get_sample_count(field)
+		#var t_range := ""
+		#if nsamples == 1:
+			#t_range = " @ t=%d" % [ samp.get_sample_time(field, 0) ]
+		#elif nsamples > 1:
+			#var field_t_start := samp.get_sample_time(field, 0)
+			#var field_t_end := samp.get_sample_time(field, -1)
+			#t_range = " @ t[%d .. %d]" % [ field_t_start, field_t_end ]
+		#print("  %22s: %d" % [ field_name, nsamples ], t_range )
 
 	for mon in monitors:
-		print(mon.id)
-		var impacts := mon.samplon.get_all_samples(BodyMonitor.Field.IMPACT)
-		print("impacts: ", ", ".join(_fmt_each("%5.2f", impacts)))
+		print("%s, %5.2f" % [ mon.id, mon._sum_shock ])
 
 
 func _fmt_each(fmt: String, arr) -> PackedStringArray:
@@ -64,7 +62,7 @@ func _ready() -> void:
 
 	var spawners: Array[ItemSpawn] = []
 	for child in get_children():
-		if child is ItemSpawn:
+		if child is ItemSpawn && child.enable:
 			spawners.push_back(child)
 
 	for spawner in spawners:

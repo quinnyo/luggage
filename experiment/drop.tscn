@@ -410,7 +410,8 @@ transform = Transform3D(0.866025, 0, 0.5, -0.453154, -0.422618, 0.784886, 0.2113
 
 [node name="item_spawn" type="Node3D" parent="."]
 script = ExtResource("2_a566b")
-tag = "A"
+enable = false
+tag = "Box"
 factory = SubResource("Resource_78yqy")
 
 [node name="spawn_grid" type="Node3D" parent="item_spawn"]
@@ -421,7 +422,7 @@ size = Vector3i(4, 1, 4)
 [node name="item_spawn2" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 0)
 script = ExtResource("2_a566b")
-tag = "B"
+tag = "BoxRot"
 factory = SubResource("Resource_bcbsq")
 
 [node name="spawn_grid" type="Node3D" parent="item_spawn2"]
@@ -432,7 +433,7 @@ size = Vector3i(4, 1, 4)
 [node name="item_spawn3" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 40)
 script = ExtResource("2_a566b")
-tag = "C"
+tag = "Capsule"
 factory = SubResource("Resource_xxlxq")
 
 [node name="spawn_grid" type="Node3D" parent="item_spawn3"]
