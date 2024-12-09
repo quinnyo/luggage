@@ -1,8 +1,8 @@
 [gd_scene load_steps=13 format=3 uid="uid://kn6d6dr35hhi"]
 
-[ext_resource type="Script" path="res://experiment/factory_test/spawn_point.gd" id="1_vuor0"]
+[ext_resource type="Script" uid="uid://cvbug3sunp43v" path="res://experiment/factory_test/spawn_point.gd" id="1_vuor0"]
 [ext_resource type="PackedScene" uid="uid://j117yt8dhntu" path="res://experiment/item_box.tscn" id="2_uh4kg"]
-[ext_resource type="Script" path="res://item/item_factory_simple.gd" id="3_m7koy"]
+[ext_resource type="Script" uid="uid://c2xc2t4hfd7x6" path="res://item/item_factory_simple.gd" id="3_m7koy"]
 [ext_resource type="PackedScene" uid="uid://88rakp3dqwo6" path="res://doodads/utility/pointer_3d.tscn" id="4_nfi8t"]
 
 [sub_resource type="Resource" id="Resource_ifwfi"]
@@ -94,6 +94,7 @@ factory = SubResource("Resource_a4vjs")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_67qh5")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="floor/CollisionShape3D"]
 mesh = SubResource("BoxMesh_auohk")

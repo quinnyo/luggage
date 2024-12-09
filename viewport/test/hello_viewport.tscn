@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://vwnfdda1f5y4"]
 
-[ext_resource type="Script" path="res://viewport/test/hello_viewport.gd" id="1_1p5wg"]
+[ext_resource type="Script" uid="uid://xedgxoauuq22" path="res://viewport/test/hello_viewport.gd" id="1_1p5wg"]
 [ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="2_257j4"]
 [ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="3_h6sx6"]
-[ext_resource type="Script" path="res://viewport/camera/camera_plus_3d.gd" id="4_vwroj"]
+[ext_resource type="Script" uid="uid://bi4xpn1ai8olr" path="res://viewport/camera/camera_plus_3d.gd" id="4_vwroj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6er5x"]
 size = Vector3(20, 1, 20)
@@ -30,6 +30,7 @@ metadata/_edit_group_ = true
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_6er5x")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Floor/CollisionShape3D"]
 mesh = SubResource("BoxMesh_jptgh")

@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://0rd3q2xfg8hj"]
 
-[ext_resource type="Script" path="res://experiment/contact_inspector.gd" id="1_x3xsl"]
+[ext_resource type="Script" uid="uid://brkbqyvk5xu5u" path="res://experiment/contact_inspector.gd" id="1_x3xsl"]
 [ext_resource type="PackedScene" uid="uid://boag6d2qfetjd" path="res://doodads/primitive/box.tscn" id="2_0hsjs"]
 [ext_resource type="PackedScene" uid="uid://cbl3hghyw1kot" path="res://doodads/primitive/capsule.tscn" id="3_8g2sl"]
-[ext_resource type="Script" path="res://viewport/camera/camera_plus_3d.gd" id="4_5o5ff"]
+[ext_resource type="Script" uid="uid://bi4xpn1ai8olr" path="res://viewport/camera/camera_plus_3d.gd" id="4_5o5ff"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n0y50"]
 transparency = 1
@@ -28,6 +28,7 @@ watch_object = NodePath("Box")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_3y6no")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
 mesh = SubResource("BoxMesh_kmlw1")

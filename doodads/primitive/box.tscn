@@ -8,6 +8,7 @@
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_1jfeo")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D"]
 mesh = ExtResource("1_nork8")
