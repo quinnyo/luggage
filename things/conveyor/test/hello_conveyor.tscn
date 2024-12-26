@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=4 uid="uid://bibt1ao0nwb4n"]
+
+[ext_resource type="Script" uid="uid://c1iio1ltpgn3n" path="res://qbits/gg_arrow.gd" id="1_peggb"]
+[ext_resource type="Script" uid="uid://dfn3rqwb3edo2" path="res://things/conveyor/section_debug_mesh.gd" id="2_hevb1"]
+[ext_resource type="Script" uid="uid://dq2f8xeiknpd4" path="res://things/conveyor/section_spline.gd" id="3_u7u1n"]
+
+[sub_resource type="Resource" id="Resource_kchw2"]
+script = ExtResource("1_peggb")
+head_length = 1.0
+head_waist = 0.5
+head_waist_slide = 0.7
+head_aspect = 0.45
+neck_frac = 0.2
+sweep = 0.5
+basis = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
+_head_vertices = PackedVector3Array(0, 0, 0, 0.09, 0, 0, 0.45, 0, -0.5, 0.225, 0, 0.7, 0, 0, 1, -0.225, 0, 0.7, -0.45, 0, -0.5, -0.09, 0, 0)
+
+[sub_resource type="Resource" id="Resource_2dwi0"]
+script = ExtResource("3_u7u1n")
+run = 8
+rise = 2
+shift_x = 4
+turn_degrees = 0
+metadata/_custom_type_script = ExtResource("3_u7u1n")
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_knaa2"]
+_surfaces = [{
+"aabb": AABB(-0.45, 0.5, -0.5, 0.9, 1e-05, 1.5),
+"format": 34359742465,
+"index_count": 18,
+"index_data": PackedByteArray("BAAAAAMAAQADAAAAAwABAAIABAAFAAAABwAAAAUABQAGAAcA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("AAAAAAAAAD8AAAAA61G4PQAAAD8AAAAAZmbmPgAAAD8AAAC/ZmZmPgAAAD8zMzM/AAAAAAAAAD8AAIA/ZmZmvgAAAD8zMzM/ZmbmvgAAAD8AAAC/61G4vQAAAD8AAAAA")
+}, {
+"aabb": AABB(3.55, 2.5, 7.5, 0.9, 1e-05, 1.5),
+"format": 34359742465,
+"index_count": 18,
+"index_data": PackedByteArray("BAAAAAMAAQADAAAAAwABAAIABAAFAAAABwAAAAUABQAGAAcA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("AACAQAAAIEAAAABBSOGCQAAAIEAAAABBZmaOQAAAIEAAAPBAMzOHQAAAIEAzMwtBAACAQAAAIEAAABBBmplxQAAAIEAzMwtBMzNjQAAAIEAAAPBAcT16QAAAIEAAAABB")
+}]
+script = ExtResource("2_hevb1")
+spline = SubResource("Resource_2dwi0")
+arrow = SubResource("Resource_kchw2")
+metadata/_custom_type_script = ExtResource("2_hevb1")
+
+[node name="HelloConveyor" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_knaa2")
