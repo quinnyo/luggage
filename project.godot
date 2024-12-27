@@ -14,6 +14,15 @@ config/name="luggage"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[display]
+
+mouse_cursor/tooltip_position_offset=Vector2(16, 24)
+
+[gui]
+
+timers/tooltip_delay_sec=0.9
+timers/tooltip_delay_sec.editor_hint=0.9
+
 [layer_names]
 
 3d_render/layer_20="DEBUG"
