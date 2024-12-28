@@ -25,6 +25,10 @@ var _bench: Bench
 var _registered_name: StringName
 
 
+func get_bench() -> Bench:
+	return _bench if is_registered() else null
+
+
 ## Returns true if this phase is registered in a Bench.
 func is_registered() -> bool:
 	return _bench && _bench.get_phase_named(_registered_name) == self

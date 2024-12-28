@@ -1,7 +1,6 @@
 class_name Bench extends Node
 
 
-const _ZedClass := preload("zed/zed_class.gd")
 const _ZedClassTable := preload("zed/zed_class_table.gd")
 const _ZedHost := preload("zed/zed_host.gd")
 
@@ -44,6 +43,10 @@ func add_phase(phase_name: StringName, phase: BenchPhase) -> void:
 ## Get the active phase.
 func get_active_phase() -> BenchPhase:
 	return _active_phase
+
+
+func get_active_phase_name() -> StringName:
+	return _phases.find_key(_active_phase) if _active_phase else &""
 
 
 func get_phase_named(phase_name: StringName) -> BenchPhase:
