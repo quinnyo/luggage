@@ -20,18 +20,22 @@ var _boxed: Array[ZedBox]
 var _shell_stack: Array[ShellLayer]
 
 
-func serialise(context) -> Variant:
-	return null
+func get_node_count() -> int:
+	return _boxed.size()
 
 
-func deserialise(context, data) -> Error:
-	return FAILED
+## callable is func(instance: Node, zed_class: ZedClass)
+func for_each_node(callable: Callable) -> void:
+	for box in _boxed:
+		callable.call(box.instance, box.zed_class)
 
 
 func clear() -> void:
 	_boxed.clear()
 	for node in get_children():
 		node.queue_free()
+	for layer in _shell_stack:
+		layer.clear()
 
 
 func add_node(instance: Node, zed_class: _ZedClass) -> void:
@@ -66,7 +70,7 @@ func push_shell(type: ShellType) -> bool:
 	layer.shell_root = Node.new()
 	add_sibling(layer.shell_root)
 	_shell_stack.push_back(layer)
-	propagate_call(METHOD_ZED_SHELL_TYPE_CHANGING, [ self, type ])
+	_notify_shell_layer_revealed(type)
 	return true
 
 
@@ -78,12 +82,18 @@ func pop_shell() -> void:
 	if layer.shell_root_is_internal:
 		layer.shell_root.queue_free()
 	_shell_stack.pop_back()
+	if _shell_stack.size():
+		_notify_shell_layer_revealed(_shell_stack[-1].type)
 
 
 ## Add a shell node to the current shell layer.
-func add_shell_node(node: Node, _dtor: Callable = Callable()) -> void:
+func add_shell_node(shell_node: Node, _dtor: Callable = Callable()) -> void:
 	assert(_shell_stack.size() > 0)
-	_shell_stack[-1].add_shell_node(node)
+	_shell_stack[-1].add_shell_node(shell_node)
+
+
+func _notify_shell_layer_revealed(type: ShellType) -> void:
+	propagate_call(METHOD_ZED_SHELL_TYPE_CHANGING, [ self, type ])
 
 
 class ZedBox:
