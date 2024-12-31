@@ -16,41 +16,36 @@ const METHOD_ZED_REGISTER := &"_zed_register"
 const METHOD_ZED_SHELL_TYPE_CHANGING := &"_zed_shell_type_changing"
 
 
-var _boxed: Array[ZedBox]
+var _parts: Array[PartBox]
 var _shell_stack: Array[ShellLayer]
 
 
-func get_node_count() -> int:
-	return _boxed.size()
+func get_part_count() -> int:
+	return _parts.size()
 
 
 ## callable is func(instance: Node, zed_class: ZedClass)
-func for_each_node(callable: Callable) -> void:
-	for box in _boxed:
+func for_each_part(callable: Callable) -> void:
+	for box in _parts:
 		callable.call(box.instance, box.zed_class)
 
 
 func clear() -> void:
-	_boxed.clear()
+	_parts.clear()
 	for node in get_children():
 		node.queue_free()
 	for layer in _shell_stack:
 		layer.clear()
 
 
-func add_node(instance: Node, zed_class: _ZedClass) -> void:
+func add_part(instance: Node, zed_class: _ZedClass) -> void:
 	add_child(instance)
-	register(instance, zed_class)
-
-
-func register(instance: Node, zed_class: _ZedClass) -> void:
-	assert(is_ancestor_of(instance))
 	instance.owner = self
 	instance.propagate_call(METHOD_ZED_REGISTER, [ self ], true)
-	var box := ZedBox.new()
+	var box := PartBox.new()
 	box.instance = instance
 	box.zed_class = zed_class
-	_boxed.push_back(box)
+	_parts.push_back(box)
 
 
 func get_shell_type() -> ShellType:
@@ -96,15 +91,9 @@ func _notify_shell_layer_revealed(type: ShellType) -> void:
 	propagate_call(METHOD_ZED_SHELL_TYPE_CHANGING, [ self, type ])
 
 
-class ZedBox:
+class PartBox:
 	var instance: Node
 	var zed_class: _ZedClass
-
-	func serialise() -> Variant:
-		return zed_class.serialise(instance)
-
-	func deserialise(data) -> Error:
-		return zed_class.deserialise(instance, data)
 
 
 class ShellLayer:

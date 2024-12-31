@@ -82,7 +82,7 @@ func deserialise(dict: Dictionary[StringName, Variant]) -> void:
 
 func capture(host: ZedHost) -> void:
 	reset()
-	host.for_each_node(add_node)
+	host.for_each_part(add_node)
 
 
 func restore(host: ZedHost) -> void:
@@ -91,6 +91,7 @@ func restore(host: ZedHost) -> void:
 
 
 func add_node(instance: Node, type: ZedClass) -> void:
+	assert(type)
 	var id := use_type(type)
 	_objects.push_back({
 		OBJ_TYPE: id,
@@ -118,7 +119,7 @@ func _restore_instance(host: ZedHost, zed: ZedClass, data: Dictionary[StringName
 	if err != OK:
 		push_error("zed deserialise failed: %s" % [ error_string(err) ])
 		return
-	host.add_node(inst, zed)
+	host.add_part(inst, zed)
 
 
 func _field_check(value: Variant, field_info: Dictionary[FieldInfo, Variant]) -> bool:
