@@ -5,23 +5,26 @@ extends Node
 const _ZedClass := preload("zed_class.gd")
 
 
-enum ShellType {
-	NONE,
-	EDIT,
-	SIM,
-}
-
-
 const METHOD_ZED_REGISTER := &"_zed_register"
-const METHOD_ZED_SHELL_TYPE_CHANGING := &"_zed_shell_type_changing"
 
 
+var _bench: Bench
 var _parts: Array[PartBox]
-var _shell_stack: Array[ShellLayer]
+var _parts_by_instance_id: Dictionary[int, PartBox]
+
+
+func setup_context(bench: Bench) -> void:
+	_bench = bench
+	_bench.get_workspace().shell_appearing.connect(_on_shell_appearing)
+	_bench.get_workspace().shell_disappearing.connect(_on_shell_disappearing)
 
 
 func get_part_count() -> int:
 	return _parts.size()
+
+
+func get_part_instance(index: int) -> Node:
+	return _parts[index].instance
 
 
 ## callable is func(instance: Node, zed_class: ZedClass)
@@ -31,11 +34,13 @@ func for_each_part(callable: Callable) -> void:
 
 
 func clear() -> void:
+	var workspace := _bench.get_workspace()
+	for part in _parts:
+		workspace.shell_remove(part.shell_id)
+		part.shell_id = 0
 	_parts.clear()
 	for node in get_children():
 		node.queue_free()
-	for layer in _shell_stack:
-		layer.clear()
 
 
 func add_part(instance: Node, zed_class: _ZedClass) -> void:
@@ -46,65 +51,43 @@ func add_part(instance: Node, zed_class: _ZedClass) -> void:
 	box.instance = instance
 	box.zed_class = zed_class
 	_parts.push_back(box)
+	_parts_by_instance_id[instance.get_instance_id()] = box
+	_create_shell(box, _bench.get_workspace().get_active_shell_type())
 
 
-func get_shell_type() -> ShellType:
-	if _shell_stack.size() > 0:
-		return _shell_stack[-1].type
-	return ShellType.NONE
+func notify_part_changed(instance: Node) -> void:
+	assert(_parts_by_instance_id.has(instance.get_instance_id()))
+	var part := _parts_by_instance_id[instance.get_instance_id()]
+	_clear_shell(part)
+	_create_shell(part, _bench.get_workspace().get_active_shell_type())
 
 
-## Push a new shell layer onto the stack.
-## Returns true on success, or false if no change was made.
-func push_shell(type: ShellType) -> bool:
-	if get_shell_type() == type:
-		return false
-	var layer := ShellLayer.new()
-	layer.type = type
-	layer.shell_root_is_internal = true
-	layer.shell_root = Node.new()
-	add_sibling(layer.shell_root)
-	_shell_stack.push_back(layer)
-	_notify_shell_layer_revealed(type)
-	return true
+func _create_shell(part: PartBox, type: Zed.ShellType) -> void:
+	var workspace := _bench.get_workspace()
+	assert(part.shell_id == 0, "part has non-zero shell_id")
+	part.shell_id = workspace.shell_create_owner()
+	for shell_node in part.zed_class.create_shell(part.instance, type):
+		workspace.shell_add_node(part.shell_id, shell_node)
 
 
-## Clear and remove the topmost shell layer.
-func pop_shell() -> void:
-	assert(_shell_stack.size() > 0)
-	var layer := _shell_stack[-1]
-	layer.clear()
-	if layer.shell_root_is_internal:
-		layer.shell_root.queue_free()
-	_shell_stack.pop_back()
-	if _shell_stack.size():
-		_notify_shell_layer_revealed(_shell_stack[-1].type)
+func _clear_shell(part: PartBox) -> void:
+	var workspace := _bench.get_workspace()
+	if part.shell_id:
+		workspace.shell_remove(part.shell_id)
+		part.shell_id = 0
 
 
-## Add a shell node to the current shell layer.
-func add_shell_node(shell_node: Node, _dtor: Callable = Callable()) -> void:
-	assert(_shell_stack.size() > 0)
-	_shell_stack[-1].add_shell_node(shell_node)
+func _on_shell_appearing(type: Zed.ShellType) -> void:
+	for part in _parts:
+		_create_shell(part, type)
 
 
-func _notify_shell_layer_revealed(type: ShellType) -> void:
-	propagate_call(METHOD_ZED_SHELL_TYPE_CHANGING, [ self, type ])
+func _on_shell_disappearing(_type: Zed.ShellType) -> void:
+	for part in _parts:
+		_clear_shell(part)
 
 
 class PartBox:
 	var instance: Node
 	var zed_class: _ZedClass
-
-
-class ShellLayer:
-	var type: ShellType
-	var shell_root: Node
-	## Set true if shell_root created by host, for this layer.
-	var shell_root_is_internal: bool = false
-
-	func add_shell_node(shell_node: Node) -> void:
-		shell_root.add_child(shell_node)
-
-	func clear() -> void:
-		for child in shell_root.get_children():
-			child.queue_free()
+	var shell_id: int

@@ -9,6 +9,7 @@ signal phase_change_started(from: BenchPhase, to: BenchPhase)
 signal phase_change_completed(to: BenchPhase)
 
 
+@export var workspace: Workspace
 @export var phases: Array[BenchPhase]
 
 
@@ -31,7 +32,12 @@ func get_zed_host() -> _ZedHost:
 		_zed_host = _ZedHost.new()
 		_zed_host.name = "ZedHost"
 		add_child(_zed_host)
+		_zed_host.setup_context(self)
 	return _zed_host
+
+
+func get_workspace() -> Workspace:
+	return workspace
 
 
 func add_phase(phase_name: StringName, phase: BenchPhase) -> void:

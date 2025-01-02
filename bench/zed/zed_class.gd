@@ -34,6 +34,10 @@ func deserialise(inst: Node, data) -> Error:
 	return _zed_deserialise(inst, data)
 
 
+func create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
+	return _zed_create_shell(inst, shell_type)
+
+
 ## The base impl returns the resource UID of the attached script.
 ## If needed, a custom [b]unique[/b] identifier can be provided by overriding this method.
 func _zed_get_type_name() -> StringName:
@@ -56,6 +60,12 @@ func _zed_serialise(inst: Node) -> Variant:
 func _zed_deserialise(inst: Node, data) -> Error:
 	push_error("Not implemented!")
 	return FAILED
+
+
+@warning_ignore("unused_parameter")
+func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
+	push_error("Not implemented!")
+	return []
 
 
 func _init() -> void:

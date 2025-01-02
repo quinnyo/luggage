@@ -32,3 +32,12 @@ func _zed_deserialise(inst: Node, data) -> Error:
 	box.density = dict[&"density"]
 	box.position = dict[&"position"]
 	return OK
+
+
+func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
+	var box := inst as _Box
+	if shell_type == Zed.ShellType.EDIT:
+		return [ box._create_edit() ]
+	elif shell_type == Zed.ShellType.SIM:
+		return [ box._create_sim() ]
+	return []

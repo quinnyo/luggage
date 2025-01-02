@@ -18,45 +18,28 @@ func _create_visual() -> Node3D:
 	return mi
 
 
-func _create_edit_root() -> Node3D:
+func _create_edit() -> Node3D:
 	var shape := BoxShape3D.new()
 	shape.size = size
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
-	var area := Area3D.new()
-	area.add_child(collider)
-	area.position = position
-	return area
+	var node := WorkspaceVolume.new()
+	node.kernel = self
+	node.add_child(collider)
+	node.position = position
+	node.add_child(_create_visual())
+	return node
 
 
-func _create_sim_root() -> Node3D:
+func _create_sim() -> Node3D:
 	var shape := BoxShape3D.new()
 	shape.size = size
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
 	var volume := shape.size.x * shape.size.y * shape.size.z
-	var body := RigidBody3D.new()
-	body.mass = volume * density
-	body.add_child(collider)
-	body.position = position
-	return body
-
-
-func _build_shell(host: ZedHost, shell_type: ZedHost.ShellType) -> void:
-	var node: Node3D
-	if shell_type == ZedHost.ShellType.EDIT:
-		node = _create_edit_root()
-	elif shell_type == ZedHost.ShellType.SIM:
-		node = _create_sim_root()
-
-	if node:
-		node.add_child(_create_visual())
-		host.add_shell_node(node)
-
-
-func _zed_register(host: ZedHost) -> void:
-	_build_shell(host, host.get_shell_type())
-
-
-func _zed_shell_type_changing(host: ZedHost, shell_type: ZedHost.ShellType) -> void:
-	_build_shell(host, shell_type)
+	var node := RigidBody3D.new()
+	node.mass = volume * density
+	node.add_child(collider)
+	node.position = position
+	node.add_child(_create_visual())
+	return node
