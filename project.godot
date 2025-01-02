@@ -26,6 +26,8 @@ timers/tooltip_delay_sec.editor_hint=0.9
 [layer_names]
 
 3d_render/layer_20="DEBUG"
+3d_physics/layer_1="GENERAL"
+3d_physics/layer_2="WORKSPACE"
 
 [physics]
 
