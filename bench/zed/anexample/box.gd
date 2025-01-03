@@ -6,6 +6,7 @@ extends Node
 @export var position: Vector3
 
 
+var _part_id: int
 var _mesh: BoxMesh
 
 
@@ -24,7 +25,6 @@ func _create_edit() -> Node3D:
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
 	var node := WorkspaceVolume.new()
-	node.kernel = self
 	node.add_child(collider)
 	node.position = position
 	node.add_child(_create_visual())

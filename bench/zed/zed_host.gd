@@ -62,6 +62,7 @@ func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
 	box.zed_class = zed_class
 	_parts[id] = box
 	_parts_by_instance_id[instance.get_instance_id()] = box
+	zed_class.part_registered(instance, id, self)
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
 
 

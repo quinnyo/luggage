@@ -34,6 +34,11 @@ func _zed_deserialise(inst: Node, data) -> Error:
 	return OK
 
 
+func _zed_part_registered(inst: Node, part_id: int, _host: ZedHost) -> void:
+	var box := inst as _Box
+	box._part_id = part_id
+
+
 func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
 	var box := inst as _Box
 	if shell_type == Zed.ShellType.EDIT:

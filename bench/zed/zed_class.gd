@@ -38,6 +38,10 @@ func deserialise(inst: Node, data) -> Error:
 	return _zed_deserialise(inst, data)
 
 
+func part_registered(inst: Node, part_id: int, host: ZedHost) -> void:
+	_zed_part_registered(inst, part_id, host)
+
+
 func create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
 	return _zed_create_shell(inst, shell_type)
 
@@ -64,6 +68,11 @@ func _zed_serialise(inst: Node) -> Variant:
 func _zed_deserialise(inst: Node, data) -> Error:
 	push_error("Not implemented!")
 	return FAILED
+
+
+@warning_ignore("unused_parameter")
+func _zed_part_registered(inst: Node, part_id: int, host: ZedHost) -> void:
+	return
 
 
 @warning_ignore("unused_parameter")
