@@ -7,8 +7,9 @@ const _ZedClass := preload("zed_class.gd")
 
 
 var _bench: Bench
-var _parts: Array[PartBox]
+var _parts: Dictionary[int, PartBox]
 var _parts_by_instance_id: Dictionary[int, PartBox]
+var _idrng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 func setup_context(bench: Bench) -> void:
@@ -21,35 +22,57 @@ func get_part_count() -> int:
 	return _parts.size()
 
 
-func get_part_instance(index: int) -> Node:
-	return _parts[index].instance
+func get_all_part_ids() -> PackedInt64Array:
+	return PackedInt64Array(_parts.keys())
 
 
-## callable is func(instance: Node, zed_class: ZedClass)
+func get_part_instance(part_id: int) -> Node:
+	assert(has_part(part_id))
+	return _parts[part_id].instance
+
+
+func has_part(part_id: int) -> bool:
+	return _parts.has(part_id)
+
+
+## callable is func(part_id: int, instance: Node, zed_class: ZedClass)
 func for_each_part(callable: Callable) -> void:
-	for box in _parts:
-		callable.call(box.instance, box.zed_class)
+	for box in _parts.values():
+		callable.call(box.id, box.instance, box.zed_class)
 
 
 func clear() -> void:
 	var workspace := _bench.get_workspace()
-	for part in _parts:
+	for part in _parts.values():
 		workspace.shell_remove(part.shell_id)
 		part.shell_id = 0
 	_parts.clear()
+	_parts_by_instance_id.clear()
 	for node in get_children():
 		node.queue_free()
 
 
-func add_part(instance: Node, zed_class: _ZedClass) -> void:
+## Insert a part with the specified ID. The node will be parented to the host.
+func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
+	assert(!_parts.has(id))
+	assert(id != 0)
 	add_child(instance)
 	instance.owner = self
 	var box := PartBox.new()
+	box.id = id
 	box.instance = instance
 	box.zed_class = zed_class
-	_parts.push_back(box)
+	_parts[id] = box
 	_parts_by_instance_id[instance.get_instance_id()] = box
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
+
+
+## Add a part instance to the scene. The node will be parented to the host.
+## The return value is a unique ID that can be used to refer to the part.
+func add_part(instance: Node, zed_class: _ZedClass) -> int:
+	var id := _idrng.randi() # NOTE: randi() value is in 32 bit range
+	insert_part(id, instance, zed_class)
+	return id
 
 
 func notify_part_changed(instance: Node) -> void:
@@ -75,16 +98,17 @@ func _clear_shell(part: PartBox) -> void:
 
 
 func _on_shell_appearing(type: Zed.ShellType) -> void:
-	for part in _parts:
+	for part in _parts.values():
 		_create_shell(part, type)
 
 
 func _on_shell_disappearing(_type: Zed.ShellType) -> void:
-	for part in _parts:
+	for part in _parts.values():
 		_clear_shell(part)
 
 
 class PartBox:
+	var id: int
 	var instance: Node
 	var zed_class: _ZedClass
 	var shell_id: int

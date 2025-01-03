@@ -5,6 +5,7 @@ extends RefCounted
 const _ZedClassTable := preload("zed_class_table.gd")
 
 const OBJ_TYPE := &"type"
+const OBJ_ID := &"id"
 const OBJ_DATA := &"data"
 const OBJ_KEYS := [OBJ_TYPE, OBJ_DATA]
 const OBJ_VALUE_TYPES := [TYPE_INT, TYPE_DICTIONARY]
@@ -18,6 +19,9 @@ const OBJ_FIELD_INFO: Dictionary[FieldInfo, Variant] = {
 	FieldInfo.TYPE: TYPE_DICTIONARY,
 	FieldInfo.DICT: {
 		OBJ_TYPE: {
+			FieldInfo.TYPE: TYPE_INT,
+		},
+		OBJ_ID: {
 			FieldInfo.TYPE: TYPE_INT,
 		},
 		OBJ_DATA: {
@@ -68,10 +72,12 @@ func deserialise(dict: Dictionary[StringName, Variant]) -> void:
 		if !_field_check(obj, OBJ_FIELD_INFO):
 			continue
 		var type: int = obj[OBJ_TYPE]
+		var obj_id: int = obj[OBJ_ID]
 		var data: Dictionary[StringName, Variant] = obj[OBJ_DATA]
 		if _used_types.has(type):
 			_objects.push_back({
 				OBJ_TYPE: type,
+				OBJ_ID: obj_id,
 				OBJ_DATA: data.duplicate(true),
 			})
 		elif _types_not_found.has(type):
@@ -82,19 +88,20 @@ func deserialise(dict: Dictionary[StringName, Variant]) -> void:
 
 func capture(host: ZedHost) -> void:
 	reset()
-	host.for_each_part(add_node)
+	host.for_each_part(add_part)
 
 
 func restore(host: ZedHost) -> void:
 	for obj in _objects:
-		_restore_instance(host, _used_types[obj[OBJ_TYPE]], obj[OBJ_DATA])
+		_restore_part(host, _used_types[obj[OBJ_TYPE]], obj[OBJ_DATA], obj[OBJ_ID])
 
 
-func add_node(instance: Node, type: ZedClass) -> void:
+func add_part(part_id: int, instance: Node, type: ZedClass) -> void:
 	assert(type)
-	var id := use_type(type)
+	var type_id := use_type(type)
 	_objects.push_back({
-		OBJ_TYPE: id,
+		OBJ_TYPE: type_id,
+		OBJ_ID: part_id,
 		OBJ_DATA: type.serialise(instance),
 	})
 
@@ -113,13 +120,13 @@ func hash_type(type: ZedClass) -> int:
 	return hash(type.get_type_info())
 
 
-func _restore_instance(host: ZedHost, zed: ZedClass, data: Dictionary[StringName, Variant]) -> void:
+func _restore_part(host: ZedHost, zed: ZedClass, data: Dictionary[StringName, Variant], part_id: int) -> void:
 	var inst := zed.instantiate()
 	var err := zed.deserialise(inst, data)
 	if err != OK:
 		push_error("zed deserialise failed: %s" % [ error_string(err) ])
 		return
-	host.add_part(inst, zed)
+	host.insert_part(part_id, inst, zed)
 
 
 func _field_check(value: Variant, field_info: Dictionary[FieldInfo, Variant]) -> bool:
