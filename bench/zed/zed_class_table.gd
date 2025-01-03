@@ -1,5 +1,6 @@
 #class_name ZedClassTable
 extends RefCounted
+## A container of (ZedClass) part class definitions.
 
 
 const _ZedClass := preload("zed_class.gd")

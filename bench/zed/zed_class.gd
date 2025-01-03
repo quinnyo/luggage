@@ -1,5 +1,9 @@
 class_name ZedClass
 extends RefCounted
+## A base class for design part class definitions.
+## New part classes are created by inheriting ZedClass and implementing the `_zed` methods.
+## The main reason this exists is to provide a standard interface for instantiating parts
+## while keeping the part data types & implementation hidden from the host context.
 
 
 const TYPE_INFO_UID := &"uid"

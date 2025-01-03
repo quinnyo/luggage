@@ -1,11 +1,9 @@
 class_name ZedHost
 extends Node
+## Host context & container for part nodes.
 
 
 const _ZedClass := preload("zed_class.gd")
-
-
-const METHOD_ZED_REGISTER := &"_zed_register"
 
 
 var _bench: Bench
@@ -46,7 +44,6 @@ func clear() -> void:
 func add_part(instance: Node, zed_class: _ZedClass) -> void:
 	add_child(instance)
 	instance.owner = self
-	instance.propagate_call(METHOD_ZED_REGISTER, [ self ], true)
 	var box := PartBox.new()
 	box.instance = instance
 	box.zed_class = zed_class
