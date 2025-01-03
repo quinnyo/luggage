@@ -25,6 +25,7 @@ func _create_edit() -> Node3D:
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
 	var node := WorkspaceVolume.new()
+	node.part_id = _part_id
 	node.add_child(collider)
 	node.position = position
 	node.add_child(_create_visual())
