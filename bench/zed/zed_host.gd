@@ -42,10 +42,8 @@ func for_each_part(callable: Callable) -> void:
 
 
 func clear() -> void:
-	var workspace := _bench.get_workspace()
 	for part in _parts.values():
-		workspace.shell_remove(part.shell_id)
-		part.shell_id = 0
+		_destroy_part(part)
 	_parts.clear()
 	_parts_by_instance_id.clear()
 	for node in get_children():
@@ -75,11 +73,25 @@ func add_part(instance: Node, zed_class: _ZedClass) -> int:
 	return id
 
 
+func remove_part(part_id: int) -> void:
+	assert(has_part(part_id))
+	var part := _parts[part_id]
+	_destroy_part(part)
+	_parts.erase(part_id)
+
+
 func notify_part_changed(instance: Node) -> void:
 	assert(_parts_by_instance_id.has(instance.get_instance_id()))
 	var part := _parts_by_instance_id[instance.get_instance_id()]
 	_clear_shell(part)
 	_create_shell(part, _bench.get_workspace().get_active_shell_type())
+
+
+## NOTE: does not remove the part from the `_parts` container!
+func _destroy_part(part: PartBox) -> void:
+	_clear_shell(part)
+	part.instance.queue_free()
+	part.id = 0
 
 
 func _create_shell(part: PartBox, type: Zed.ShellType) -> void:
