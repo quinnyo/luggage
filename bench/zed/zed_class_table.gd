@@ -66,8 +66,11 @@ func lookup_type_info(ti: Dictionary[StringName, Variant]) -> _ZedClass:
 	return null
 
 
-#func get_types() -> Array[_ZedClass]:
-	#return _table.values()
+func get_classes() -> Array[_ZedClass]:
+	var result: Array[_ZedClass] = []
+	for entry in _table.values():
+		result.push_back(entry.type)
+	return result
 
 
 func _has_entry(id: StringName) -> bool:
