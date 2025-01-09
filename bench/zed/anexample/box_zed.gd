@@ -8,6 +8,10 @@ func randf3() -> Vector3:
 	return Vector3(randf(), randf(), randf())
 
 
+func _zed_get_type_name() -> StringName:
+	return &"zed.example.Box"
+
+
 func _zed_instantiate() -> Node:
 	var inst := _Box.new()
 	inst.size = Vector3.ONE * 0.25 + randf3()
@@ -46,3 +50,7 @@ func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
 	elif shell_type == Zed.ShellType.SIM:
 		return [ box._create_sim() ]
 	return []
+
+
+func _zed_get_buildable_name() -> String:
+	return "Box (an example)"

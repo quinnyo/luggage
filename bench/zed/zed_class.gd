@@ -46,6 +46,14 @@ func create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
 	return _zed_create_shell(inst, shell_type)
 
 
+func get_buildable_name() -> String:
+	return _zed_get_buildable_name()
+
+
+func get_buildable_icon() -> Texture2D:
+	return _zed_get_buildable_icon()
+
+
 ## The base impl returns the resource UID of the attached script.
 ## If needed, a custom [b]unique[/b] identifier can be provided by overriding this method.
 func _zed_get_type_name() -> StringName:
@@ -79,6 +87,14 @@ func _zed_part_registered(inst: Node, part_id: int, host: ZedHost) -> void:
 func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
 	push_error("Not implemented!")
 	return []
+
+
+func _zed_get_buildable_name() -> String:
+	return get_type_name()
+
+
+func _zed_get_buildable_icon() -> Texture2D:
+	return preload("../icons/zed_buildable.svg")
 
 
 func _init() -> void:
