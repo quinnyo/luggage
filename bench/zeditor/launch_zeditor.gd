@@ -1,12 +1,9 @@
 extends Node
 
 
-const _Zeditor := preload("zeditor.gd")
+@export var zeditor: Zeditor
 
-
-@export var zeditor: _Zeditor
-
-var _launched: _Zeditor
+var _launched: Zeditor
 
 
 func _phase_entering(phase: BenchPhase) -> void:

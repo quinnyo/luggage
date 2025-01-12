@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2tks4xa6m1jr"]
+
+[ext_resource type="Script" uid="uid://b7t4ve8ydb0vr" path="res://bench/zeditor/gui/item_picker.gd" id="1_un5bt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ogioj"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.914372, 0.847351, 0.85655, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="ItemTray" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+script = ExtResource("1_un5bt")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ogioj")
+
+[node name="ItemListContainer" type="BoxContainer" parent="ScrollContainer/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+vertical = true
