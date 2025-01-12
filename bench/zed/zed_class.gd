@@ -12,17 +12,19 @@ const TYPE_INFO_GLOBAL_NAME := &"global_name"
 const TYPE_INFO_TYPE_NAME := &"type_name"
 
 
-var _type_name: StringName
-var _type_info: Dictionary[StringName, Variant]
-
-
 func get_type_info() -> Dictionary[StringName, Variant]:
-	return _type_info.duplicate()
+	var s: Script = get_script()
+	return {
+		TYPE_INFO_UID: ResourceLoader.get_resource_uid(s.resource_path),
+		TYPE_INFO_PATH: s.resource_path,
+		TYPE_INFO_GLOBAL_NAME: s.get_global_name(),
+		TYPE_INFO_TYPE_NAME: _zed_get_type_name(),
+	}
 
 
 ## Get this ZedClass's unique identifier.
 func get_type_name() -> StringName:
-	return _type_name
+	return _zed_get_type_name()
 
 
 func instantiate() -> Node:
@@ -30,7 +32,6 @@ func instantiate() -> Node:
 
 
 func serialise(inst: Node) -> Variant:
-	#Dictionary[StringName, Variant]
 	return _zed_serialise(inst)
 
 
@@ -95,17 +96,6 @@ func _zed_get_buildable_name() -> String:
 
 func _zed_get_buildable_icon() -> Texture2D:
 	return preload("../icons/zed_buildable.svg")
-
-
-func _init() -> void:
-	_type_name = _zed_get_type_name()
-	var s: Script = get_script()
-	_type_info = {
-		TYPE_INFO_UID: ResourceLoader.get_resource_uid(s.resource_path),
-		TYPE_INFO_PATH: s.resource_path,
-		TYPE_INFO_GLOBAL_NAME: s.get_global_name(),
-		TYPE_INFO_TYPE_NAME: _zed_get_type_name(),
-	}
 
 
 func _to_string() -> String:
