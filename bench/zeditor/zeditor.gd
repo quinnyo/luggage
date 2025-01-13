@@ -6,6 +6,12 @@ const ACTION_POINTER_ACTIVATE := &"pointer_activate"
 const ACTION_BUILD_MENU := &"build_menu"
 
 
+signal launching()
+signal halting()
+signal placement_activated(placement: Placement3D)
+signal placement_deactivated(placement: Placement3D)
+
+
 ## Pointer to move to indicate the active object
 @export var active_pointer: Node3D
 
@@ -36,21 +42,25 @@ func setup_context(bench: Bench) -> void:
 
 
 func launch() -> void:
+	launching.emit()
 	return
 
 
 func halt() -> void:
+	halting.emit()
 	return
 
 
 func add_active(placement: Placement3D) -> void:
 	_active.push_back(placement)
 	placement.activate()
+	placement_activated.emit(placement)
 
 
 func clear_active() -> void:
 	for placement in _active:
 		placement.deactivate()
+		placement_deactivated.emit(placement)
 	_active.clear()
 
 
