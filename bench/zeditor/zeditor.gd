@@ -21,7 +21,6 @@ signal placement_deactivated(placement: Placement3D)
 
 var _bench: Bench
 var _workspace: Workspace
-var _picking: Picking
 
 var _picked: Placement3D
 var _active: Array[Placement3D] = []
@@ -43,12 +42,12 @@ func setup_context(bench: Bench) -> void:
 
 func launch() -> void:
 	launching.emit()
-	return
+	process_mode = Node.PROCESS_MODE_INHERIT
 
 
 func halt() -> void:
 	halting.emit()
-	return
+	process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func add_active(placement: Placement3D) -> void:
@@ -88,10 +87,13 @@ func _build_menu() -> void:
 	item_tray.open()
 
 
-func _enter_tree() -> void:
+func _init() -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED
+
+
+func _ready() -> void:
 	var vpp := ViewportPlus.get_viewport_plus(self)
-	_picking = vpp.get_picking()
-	_picking.picked.connect(_on_picking_picked)
+	vpp.get_picking().picked.connect(_on_picking_picked)
 
 
 func _unhandled_input(event: InputEvent) -> void:
