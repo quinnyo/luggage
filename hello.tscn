@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=22 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://dq73vl5beovtk" path="res://viewport/extra/picking_info_label.gd" id="10_f0urt"]
 [ext_resource type="PackedScene" uid="uid://d2tks4xa6m1jr" path="res://bench/zeditor/gui/item_tray.tscn" id="12_1dpvp"]
 [ext_resource type="Script" uid="uid://bk5a3tflnvat0" path="res://bench/zeditor/toolbag.gd" id="12_j2aeq"]
+[ext_resource type="Script" uid="uid://bkixpxic4008u" path="res://bench/zed/anexample/box_zeditor_module.gd" id="12_jcig6"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
 
@@ -129,6 +130,9 @@ item_tray = NodePath("ItemTray")
 [node name="Toolbag" type="Node" parent="Bench/Zeditor"]
 script = ExtResource("12_j2aeq")
 metadata/_custom_type_script = ExtResource("12_j2aeq")
+
+[node name="BoxZeditorModule" type="Node" parent="Bench/Zeditor"]
+script = ExtResource("12_jcig6")
 
 [node name="ItemTray" parent="Bench/Zeditor" instance=ExtResource("12_1dpvp")]
 
