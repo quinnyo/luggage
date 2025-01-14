@@ -10,8 +10,8 @@ const PHASE_NAME_RUN := &"Run"
 
 @onready var bench: Bench = $Bench
 
+var _build_types: Array[StringName]
 var _data
-
 var _parts: PackedInt64Array
 
 
@@ -75,9 +75,9 @@ func _delete_one() -> void:
 		host.remove_part(id)
 
 
-func _create_box() -> void:
+func _build(idx: int) -> void:
 	var table := bench.get_zed_class_table()
-	var zed := table.get_type(&"uid://bsjphndhgyt5o")
+	var zed := table.get_type(_build_types[idx])
 	var node := zed.instantiate()
 	var id := bench.get_zed_host().add_part(node, zed)
 	_parts.push_back(id)
@@ -103,6 +103,7 @@ func _ready() -> void:
 		if o && Qb.script_has_base_script(o, ZedClass):
 			var zed: ZedClass = o.new()
 			table.add_type(zed)
+			_build_types.push_back(zed.get_type_name())
 		elif o:
 			push_error("not good: ", o)
 
@@ -130,8 +131,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			_delete_one()
 		elif event is InputEventKey:
 			var kev := event as InputEventKey
-			if kev.keycode == KEY_1 && kev.pressed:
-				_create_box()
+			if kev.keycode >= KEY_0 && kev.keycode <= KEY_9 && kev.pressed:
+				var idx := kev.keycode - KEY_0
+				if idx < _build_types.size():
+					_build(idx)
 	elif bench.get_active_phase_name() == PHASE_NAME_RUN:
 		if event.is_action_pressed(&"ui_cancel"):
 			bench.change_phase_named(PHASE_NAME_EDIT)
