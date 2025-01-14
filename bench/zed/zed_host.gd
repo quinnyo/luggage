@@ -31,6 +31,11 @@ func get_part_instance(part_id: int) -> Node:
 	return _parts[part_id].instance
 
 
+func get_part_class(part_id: int) -> ZedClass:
+	assert(has_part(part_id))
+	return _parts[part_id].zed_class
+
+
 func has_part(part_id: int) -> bool:
 	return _parts.has(part_id)
 
