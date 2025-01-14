@@ -1,5 +1,6 @@
 extends ZedClass
 
+const TYPE_NAME := &"zed.example.Box"
 
 const _Box := preload("box.gd")
 
@@ -9,7 +10,7 @@ func randf3() -> Vector3:
 
 
 func _zed_get_type_name() -> StringName:
-	return &"zed.example.Box"
+	return TYPE_NAME
 
 
 func _zed_instantiate() -> Node:
