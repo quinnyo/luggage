@@ -177,26 +177,26 @@ func has_active(editable_id: int) -> bool:
 	return _active.has(editable_id)
 
 
-func add_active(placement: Placement3D) -> int:
-	var id := placement.part_id
+func add_active(id: int) -> void:
 	assert(!has_active(id))
 	var editable := EditableInfo.new()
 	editable.id = id
-	editable.placement = placement
 	_active[id] = editable
-	placement.activate()
+
+	var zhost := _bench.get_zed_host()
+	var shell_id := zhost.get_part_shell_id(id)
+	for node in _workspace.shell_get_nodes(shell_id):
+		if node is Placement3D:
+			editable_set_placement(id, node)
+			break
+
 	editable_activated.emit(id)
 	_process_builder_requests()
-	placement.tree_exiting.connect(_on_placement_tree_exiting.bind(placement))
-	return id
 
 
 func remove_active(editable_id: int) -> void:
 	assert(has_active(editable_id))
-	var editable := _active[editable_id]
-	if editable.placement && !editable.placement.is_queued_for_deletion():
-		editable.placement.deactivate()
-		editable.placement.tree_exiting.disconnect(_on_placement_tree_exiting)
+	editable_set_placement(editable_id, null)
 	if editable_is_locked(editable_id):
 		editable_unlock(editable_id)
 	editable_deactivated.emit(editable_id)
@@ -211,6 +211,20 @@ func clear_active() -> void:
 
 func get_first_active() -> Placement3D:
 	return get_active_placement(_active.keys()[0]) if _active.size() else null
+
+
+func editable_set_placement(editable_id: int, placement: Placement3D) -> void:
+	assert(has_active(editable_id))
+	var editable := _active[editable_id]
+	if editable.placement == placement:
+		return
+	elif editable.placement && !editable.placement.is_queued_for_deletion():
+		editable.placement.deactivate()
+		editable.placement.tree_exiting.disconnect(_on_active_placement_tree_exiting)
+	editable.placement = placement
+	if placement:
+		placement.activate()
+		placement.tree_exiting.connect(_on_active_placement_tree_exiting.bind(editable_id, placement))
 
 
 func editable_is_locked(editable: int) -> bool:
@@ -339,7 +353,7 @@ func _populate_item_picker() -> void:
 func _pointer_activate() -> void:
 	clear_active()
 	if _picked:
-		add_active(_picked)
+		add_active(_picked.part_id)
 
 
 func _build_menu() -> void:
@@ -363,9 +377,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_build_menu()
 
 
-func _on_placement_tree_exiting(placement: Placement3D) -> void:
-	if has_active(placement.part_id):
-		remove_active(placement.part_id)
+func _on_active_placement_tree_exiting(editable_id: int, _placement: Placement3D) -> void:
+	if has_active(editable_id):
+		editable_set_placement(editable_id, null)
 
 
 func _on_picking_picked(object: Node) -> void:
