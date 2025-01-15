@@ -56,6 +56,11 @@ func shell_add_node(shell_id: int, shell_node: Node) -> void:
 	_shell_top().add_shell_node(shell_id, shell_node)
 
 
+func shell_get_nodes(shell_id: int) -> Array[Node]:
+	assert(has_shell())
+	return _shell_top().get_shell_nodes(shell_id)
+
+
 func shell_remove(shell_id: int) -> void:
 	assert(has_shell())
 	_shell_top().remove_shell(shell_id)

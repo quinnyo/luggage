@@ -32,6 +32,11 @@ func add_shell_node(shell_id: int, shell_node: Node) -> void:
 	add_child(shell_node)
 
 
+func get_shell_nodes(shell_id: int) -> Array[Node]:
+	assert(_shells.has(shell_id))
+	return _shells[shell_id].shell_nodes.duplicate()
+
+
 func remove_shell(shell_id: int) -> void:
 	assert(_shells.has(shell_id))
 	_clear_shell(_shells[shell_id])
