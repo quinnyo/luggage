@@ -121,8 +121,6 @@ signal editable_activated(editable_id: int)
 signal editable_deactivated(editable_id: int)
 
 
-## Pointer to move to indicate the active object
-@export var active_pointer: Node3D
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
 
@@ -229,6 +227,13 @@ func channel_has(channel: int, module: int) -> bool:
 
 func channel_is_empty(channel: int) -> bool:
 	return !channels.has_left(channel)
+
+
+func channel_alloc() -> int:
+	var channel := randi()
+	while !channel_is_empty(channel):
+		channel = randi()
+	return channel
 
 
 func module_register(node: Node) -> int:
@@ -355,16 +360,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pointer_activate()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
 		_build_menu()
-
-
-func _process(_delta: float) -> void:
-	var placement := get_first_active()
-	if active_pointer:
-		if placement:
-			active_pointer.global_position = placement.global_position
-			active_pointer.show()
-		else:
-			active_pointer.hide()
 
 
 func _on_placement_tree_exiting(placement: Placement3D) -> void:

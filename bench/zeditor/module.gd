@@ -50,7 +50,8 @@ func _module_editable_released(editable_id: int) -> void:
 	return
 
 
-func _on_zeditor_editable_activated(editable_id: int) -> void:
+@warning_ignore("unused_parameter")
+func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 	var placement := _zeditor.get_active_placement(editable_id)
 	if _module_handles_placement(placement):
 		var req := _zeditor.request_activate_builder(_id, activation_channel, editable_id, activation_priority)
@@ -63,7 +64,8 @@ func _on_zeditor_editable_activated(editable_id: int) -> void:
 		)
 
 
-func _on_zeditor_editable_deactivated(editable_id: int) -> void:
+@warning_ignore("unused_parameter")
+func _module_on_zeditor_editable_deactivated(editable_id: int) -> void:
 	if !_holding.has(editable_id):
 		return
 	_holding.erase(editable_id)
@@ -77,13 +79,13 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_ENTER_TREE:
 		_zeditor = get_parent() as Zeditor
 		_id = _zeditor.module_register(self)
-		_zeditor.editable_activated.connect(_on_zeditor_editable_activated)
-		_zeditor.editable_deactivated.connect(_on_zeditor_editable_deactivated)
+		_zeditor.editable_activated.connect(_module_on_zeditor_editable_activated)
+		_zeditor.editable_deactivated.connect(_module_on_zeditor_editable_deactivated)
 		_module_registered(_id, _zeditor)
 	elif what == NOTIFICATION_EXIT_TREE:
 		if _zeditor && _id:
 			_zeditor.module_deregister(_id)
-			_zeditor.editable_activated.disconnect(_on_zeditor_editable_activated)
-			_zeditor.editable_deactivated.disconnect(_on_zeditor_editable_deactivated)
+			_zeditor.editable_activated.disconnect(_module_on_zeditor_editable_activated)
+			_zeditor.editable_deactivated.disconnect(_module_on_zeditor_editable_deactivated)
 			_zeditor = null
 			_id = 0
