@@ -209,10 +209,6 @@ func clear_active() -> void:
 	_active.clear()
 
 
-func get_first_active() -> Placement3D:
-	return get_active_placement(_active.keys()[0]) if _active.size() else null
-
-
 func editable_set_placement(editable_id: int, placement: Placement3D) -> void:
 	assert(has_active(editable_id))
 	var editable := _active[editable_id]
