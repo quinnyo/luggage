@@ -27,13 +27,16 @@ func get_all_part_ids() -> PackedInt64Array:
 
 
 func get_part_instance(part_id: int) -> Node:
-	assert(has_part(part_id))
-	return _parts[part_id].instance
+	return _get_part(part_id).instance
 
 
 func get_part_class(part_id: int) -> ZedClass:
-	assert(has_part(part_id))
-	return _parts[part_id].zed_class
+	return _get_part(part_id).zed_class
+
+
+## Get the Workspace shell owner ID allocated to the part with ID [param part_id].
+func get_part_shell_id(part_id: int) -> int:
+	return _get_part(part_id).shell_id
 
 
 func has_part(part_id: int) -> bool:
@@ -80,8 +83,7 @@ func add_part(instance: Node, zed_class: _ZedClass) -> int:
 
 
 func remove_part(part_id: int) -> void:
-	assert(has_part(part_id))
-	var part := _parts[part_id]
+	var part := _get_part(part_id)
 	_destroy_part(part)
 	_parts.erase(part_id)
 
@@ -91,6 +93,13 @@ func notify_part_changed(instance: Node) -> void:
 	var part := _parts_by_instance_id[instance.get_instance_id()]
 	_clear_shell(part)
 	_create_shell(part, _bench.get_workspace().get_active_shell_type())
+
+
+func _get_part(part_id: int) -> PartBox:
+	if !has_part(part_id):
+		push_error("Part not found (0x%X)" % [ part_id ])
+		return null
+	return _parts[part_id]
 
 
 ## NOTE: does not remove the part from the `_parts` container!
