@@ -74,29 +74,7 @@ func change_phase_named(to_name: StringName) -> void:
 		_start_phase_change(_phases[to_name])
 
 
-func _start_phase_change(to: BenchPhase) -> void:
-	if is_phase_in_transition():
-		push_warning("transition in progress")
-		return
-	if _active_phase == to:
-		push_warning("cannot change to current phase")
-		return
-	print("[Bench] changing %s --> %s" % [ _phase_str(_active_phase), _phase_str(to) ])
-	if _active_phase:
-		_active_phase.phase_deactivate()
-	_dest_phase = to
-	if _dest_phase:
-		_dest_phase.phase_activate()
-	phase_change_started.emit(_active_phase, _dest_phase)
-
-
-func _end_phase_change() -> void:
-	_active_phase = _dest_phase
-	phase_change_completed.emit(_active_phase)
-	print("[Bench] changed to %s" % [ _phase_str(_active_phase) ])
-
-
-func _phase_str(phase: BenchPhase) -> String:
+func get_phase_string(phase: BenchPhase) -> String:
 	var parts = ["Phase"]
 	if phase:
 		var key = _phases.find_key(phase)
@@ -109,6 +87,28 @@ func _phase_str(phase: BenchPhase) -> String:
 	else:
 		parts.push_back("NULL")
 	return "%s" % [ ":".join(parts) ]
+
+
+func _start_phase_change(to: BenchPhase) -> void:
+	if is_phase_in_transition():
+		push_warning("transition in progress")
+		return
+	if _active_phase == to:
+		push_warning("cannot change to current phase")
+		return
+	#print("[Bench] changing %s --> %s" % [ get_phase_string(_active_phase), get_phase_string(to) ])
+	if _active_phase:
+		_active_phase.phase_deactivate()
+	_dest_phase = to
+	if _dest_phase:
+		_dest_phase.phase_activate()
+	phase_change_started.emit(_active_phase, _dest_phase)
+
+
+func _end_phase_change() -> void:
+	_active_phase = _dest_phase
+	phase_change_completed.emit(_active_phase)
+	print("[Bench] changed to %s" % [ get_phase_string(_active_phase) ])
 
 
 func _ready() -> void:

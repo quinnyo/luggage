@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=24 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://cdpuwy53xo6gv" path="res://bench/zeditor/modules/highlighter.gd" id="12_aj2tw"]
 [ext_resource type="Script" uid="uid://bk5a3tflnvat0" path="res://bench/zeditor/toolbag.gd" id="12_j2aeq"]
 [ext_resource type="Script" uid="uid://bkixpxic4008u" path="res://bench/zed/anexample/box_zeditor_module.gd" id="12_jcig6"]
+[ext_resource type="PackedScene" uid="uid://d3uwlt4547leb" path="res://bench/extra/bench_status_overlay.tscn" id="15_tdyvq"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
 
@@ -138,7 +139,7 @@ script = ExtResource("12_jcig6")
 
 [node name="ItemTray" parent="Bench/Zeditor" instance=ExtResource("12_1dpvp")]
 
-[node name="DebugOverlay" type="BoxContainer" parent="Bench/Zeditor"]
+[node name="DebugOverlay" type="BoxContainer" parent="Bench"]
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 84.0
@@ -146,7 +147,10 @@ grow_vertical = 2
 mouse_filter = 2
 vertical = true
 
-[node name="PickingInfoLabel" type="Label" parent="Bench/Zeditor/DebugOverlay"]
+[node name="BenchStatusOverlay" parent="Bench/DebugOverlay" instance=ExtResource("15_tdyvq")]
+layout_mode = 2
+
+[node name="PickingInfoLabel" type="Label" parent="Bench/DebugOverlay"]
 layout_mode = 2
 text = "words of label"
 label_settings = SubResource("LabelSettings_r657h")
