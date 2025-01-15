@@ -20,7 +20,7 @@ var _shells: Array[_WorkspaceShellLayer]
 var _placement_conflicts: Dictionary[int, Dictionary]
 
 
-func push_shell(shell_type: int) -> void:
+func push_shell_layer(shell_type: int) -> void:
 	if _shells.size() > 0:
 		_notify_shell_disappearing(_shell_top())
 	var layer := _WorkspaceShellLayer.new()
@@ -30,7 +30,7 @@ func push_shell(shell_type: int) -> void:
 	add_child(layer)
 
 
-func pop_shell() -> void:
+func pop_shell_layer() -> void:
 	assert(has_shell())
 	var top := _shell_top()
 	_notify_shell_disappearing(top)
