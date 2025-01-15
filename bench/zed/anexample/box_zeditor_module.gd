@@ -4,12 +4,12 @@ extends ZeditorModule
 const _BoxZed := preload("box_zed.gd")
 
 
-func _module_handles_placement(placement: Placement3D) -> bool:
+func _module_handles_editable(editable_id: int) -> bool:
 	var zhost := get_bench().get_zed_host()
-	var zed := zhost.get_part_class(placement.part_id)
-	if zed.get_type_name() == _BoxZed.TYPE_NAME:
-		return true
-	return false
+	if !zhost.has_part(editable_id):
+		return false
+	var zed := zhost.get_part_class(editable_id)
+	return zed.get_type_name() == _BoxZed.TYPE_NAME
 
 
 func _module_activated() -> void:

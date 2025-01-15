@@ -8,6 +8,7 @@ class ModuleInfo:
 
 
 class EditableInfo:
+	## Zed/Workspace part ID
 	var id: int
 	var placement: Placement3D
 
@@ -177,7 +178,7 @@ func has_active(editable_id: int) -> bool:
 
 
 func add_active(placement: Placement3D) -> int:
-	var id := placement.get_instance_id()
+	var id := placement.part_id
 	assert(!has_active(id))
 	var editable := EditableInfo.new()
 	editable.id = id
@@ -196,9 +197,9 @@ func remove_active(editable_id: int) -> void:
 	if editable.placement && !editable.placement.is_queued_for_deletion():
 		editable.placement.deactivate()
 		editable.placement.tree_exiting.disconnect(_on_placement_tree_exiting)
-	if editable_is_locked(editable.id):
-		editable_unlock(editable.id)
-	editable_deactivated.emit(editable.id)
+	if editable_is_locked(editable_id):
+		editable_unlock(editable_id)
+	editable_deactivated.emit(editable_id)
 	_active.erase(editable_id)
 
 
@@ -363,9 +364,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_placement_tree_exiting(placement: Placement3D) -> void:
-	var id := placement.get_instance_id()
-	if has_active(id):
-		remove_active(id)
+	if has_active(placement.part_id):
+		remove_active(placement.part_id)
 
 
 func _on_picking_picked(object: Node) -> void:

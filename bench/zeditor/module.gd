@@ -23,7 +23,7 @@ func get_bench() -> Bench:
 
 ## Override this and return true if module should activate
 @warning_ignore("unused_parameter")
-func _module_handles_placement(placement: Placement3D) -> bool:
+func _module_handles_editable(editable_id: int) -> bool:
 	return false
 
 
@@ -53,7 +53,7 @@ func _module_editable_released(editable_id: int) -> void:
 @warning_ignore("unused_parameter")
 func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 	var placement := _zeditor.get_active_placement(editable_id)
-	if _module_handles_placement(placement):
+	if _module_handles_editable(editable_id):
 		var req := _zeditor.request_activate_builder(_id, activation_channel, editable_id, activation_priority)
 		req.processed.connect(func(accepted: bool):
 			if accepted:
