@@ -394,3 +394,7 @@ func _on_item_tray_item_selected(item_id: int) -> void:
 	if data is Toolbag.Buildable:
 		var buildable := data as Toolbag.Buildable
 		print("Buildable selected: %s" % [ buildable.zed_class ])
+
+		var instance := buildable.zed_class.instantiate()
+		var part_id := _bench.get_zed_host().add_part(instance, buildable.zed_class)
+		add_active(part_id)
