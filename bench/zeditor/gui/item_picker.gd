@@ -96,11 +96,11 @@ func group_set_text(id: int, text: String) -> void:
 
 
 func open() -> void:
-	show()
+	_open()
 
 
 func abort() -> void:
-	hide()
+	_close()
 	aborted.emit()
 
 
@@ -120,13 +120,25 @@ func _selected(item: _Item) -> void:
 		if _current:
 			_current.set_pressed_no_signal(false)
 		_current = item
-	hide()
+	_close()
 	item_selected.emit(item.id)
 
 
-func _reset() -> void:
-	_group_create(GROUP_DEFAULT, "")
+func _open() -> void:
+	show()
+	set_process_unhandled_input(true)
+	set_process(true)
+
+
+func _close() -> void:
 	hide()
+	set_process_unhandled_input(false)
+	set_process(false)
+
+
+func _reset() -> void:
+	_close()
+	_group_create(GROUP_DEFAULT, "")
 
 
 func _init() -> void:
