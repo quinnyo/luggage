@@ -18,11 +18,6 @@ config/icon="res://icon.svg"
 
 mouse_cursor/tooltip_position_offset=Vector2(16, 24)
 
-[gui]
-
-timers/tooltip_delay_sec=0.9
-timers/tooltip_delay_sec.editor_hint=86400.0
-
 [input]
 
 pointer_activate={
