@@ -145,8 +145,10 @@ func _gui_input(event: InputEvent) -> void:
 		# FIXME: hard-coded input mapping
 		if !mbev.pressed && mbev.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
 			abort()
+			get_viewport().set_input_as_handled()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"ui_cancel"):
 		abort()
+		get_viewport().set_input_as_handled()
