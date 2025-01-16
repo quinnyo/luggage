@@ -13,7 +13,7 @@ const _ZedClass := preload("zed_class.gd")
 var _bench: Bench
 var _parts: Dictionary[int, PartBox]
 var _parts_by_instance_id: Dictionary[int, PartBox]
-var _idrng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _id_next: int = 1
 
 
 func setup_context(bench: Bench) -> void:
@@ -61,10 +61,18 @@ func clear() -> void:
 		node.queue_free()
 
 
+## Allocate a unique part ID
+func alloc_part_id() -> int:
+	var id := _id_next
+	_id_next += 1
+	return id
+
+
 ## Insert a part with the specified ID. The node will be parented to the host.
 func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
 	assert(!_parts.has(id))
 	assert(id != 0)
+	_id_next = maxi(_id_next, id + 1)
 	add_child(instance)
 	instance.owner = self
 	var box := PartBox.new()
@@ -81,7 +89,7 @@ func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
 ## Add a part instance to the scene. The node will be parented to the host.
 ## The return value is a unique ID that can be used to refer to the part.
 func add_part(instance: Node, zed_class: _ZedClass) -> int:
-	var id := _idrng.randi() # NOTE: randi() value is in 32 bit range
+	var id := alloc_part_id()
 	insert_part(id, instance, zed_class)
 	return id
 
