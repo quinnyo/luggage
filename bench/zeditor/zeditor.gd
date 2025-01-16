@@ -156,6 +156,8 @@ func setup_context(bench: Bench) -> void:
 	_bench = bench
 	_workspace = _bench.get_workspace()
 
+	_bench.get_zed_host().part_removed.connect(_on_zed_host_part_removed)
+
 	# NOTE: Cheating here for testing -- toolbag is to be initialised externally and passed to Zeditor.
 	for zc in _bench.get_zed_class_table().get_classes():
 		toolbag.add_buildable(zc)
@@ -423,6 +425,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pointer_activate()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
 		_build_menu()
+
+
+func _on_zed_host_part_removed(part_id: int) -> void:
+	if has_active(part_id):
+		remove_active(part_id)
 
 
 func _on_active_placement_tree_exiting(editable_id: int, _placement: Placement3D) -> void:
