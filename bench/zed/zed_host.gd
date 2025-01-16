@@ -3,6 +3,10 @@ extends Node
 ## Host context & container for part nodes.
 
 
+signal part_added(part_id: int)
+signal part_removed(part_id: int)
+
+
 const _ZedClass := preload("zed_class.gd")
 
 
@@ -50,9 +54,8 @@ func for_each_part(callable: Callable) -> void:
 
 
 func clear() -> void:
-	for part in _parts.values():
-		_destroy_part(part)
-	_parts.clear()
+	for part_id in _parts.keys():
+		remove_part(part_id)
 	_parts_by_instance_id.clear()
 	for node in get_children():
 		node.queue_free()
@@ -72,6 +75,7 @@ func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
 	_parts_by_instance_id[instance.get_instance_id()] = box
 	zed_class.part_registered(instance, id, self)
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
+	part_added.emit(id)
 
 
 ## Add a part instance to the scene. The node will be parented to the host.
@@ -84,8 +88,12 @@ func add_part(instance: Node, zed_class: _ZedClass) -> int:
 
 func remove_part(part_id: int) -> void:
 	var part := _get_part(part_id)
-	_destroy_part(part)
+	_clear_shell(part)
+	_parts_by_instance_id.erase(part.instance.get_instance_id())
+	part.instance.queue_free()
+	part.id = 0
 	_parts.erase(part_id)
+	part_removed.emit(part_id)
 
 
 func notify_part_changed(instance: Node) -> void:
@@ -100,13 +108,6 @@ func _get_part(part_id: int) -> PartBox:
 		push_error("Part not found (0x%X)" % [ part_id ])
 		return null
 	return _parts[part_id]
-
-
-## NOTE: does not remove the part from the `_parts` container!
-func _destroy_part(part: PartBox) -> void:
-	_clear_shell(part)
-	part.instance.queue_free()
-	part.id = 0
 
 
 func _create_shell(part: PartBox, type: Zed.ShellType) -> void:
