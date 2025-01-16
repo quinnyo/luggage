@@ -98,7 +98,7 @@ func remove_part(part_id: int) -> void:
 	var part := _get_part(part_id)
 	_clear_shell(part)
 	_parts_by_instance_id.erase(part.instance.get_instance_id())
-	part.instance.queue_free()
+	remove_child(part.instance)
 	part.id = 0
 	_parts.erase(part_id)
 	part_removed.emit(part_id)

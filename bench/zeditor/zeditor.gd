@@ -139,6 +139,7 @@ signal editable_deactivated(editable_id: int)
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
 
+var unre: UndoRedo = UndoRedo.new()
 
 var _bench: Bench
 var _workspace: Workspace
@@ -350,6 +351,29 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 	return req
 
 
+## Create a new instance of the buildable part
+func build(buildable: Toolbag.Buildable) -> void:
+	var part_id := _bench.get_zed_host().alloc_part_id()
+	var instance := buildable.zed_class.instantiate()
+	unre.create_action("build %s" % [ buildable.zed_class ])
+	unre.add_do_method(_build_part.bind(part_id, instance, buildable))
+	unre.add_do_reference(instance)
+	unre.add_undo_method(_unbuild_part.bind(part_id))
+	unre.commit_action()
+
+
+func _build_part(part_id: int, instance: Node, buildable: Toolbag.Buildable) -> void:
+	_bench.get_zed_host().insert_part(part_id, instance, buildable.zed_class)
+	clear_active()
+	add_active(part_id)
+
+
+func _unbuild_part(part_id: int) -> void:
+	if has_active(part_id):
+		remove_active(part_id)
+	_bench.get_zed_host().remove_part(part_id)
+
+
 func _process_builder_requests() -> void:
 	var by_editable: Dictionary[int, Array]
 	for req in _builder_requests:
@@ -425,6 +449,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pointer_activate()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
 		_build_menu()
+	elif event.is_action_pressed(&"ui_undo"):
+		print("undo")
+		unre.undo()
+	elif event.is_action_pressed(&"ui_redo"):
+		print("redo")
+		unre.redo()
 
 
 func _on_zed_host_part_removed(part_id: int) -> void:
@@ -440,9 +470,4 @@ func _on_active_placement_tree_exiting(editable_id: int, _placement: Placement3D
 func _on_item_tray_item_selected(item_id: int) -> void:
 	var data := item_tray.item_get_userdata(item_id) as Toolbag.BaseItem
 	if data is Toolbag.Buildable:
-		var buildable := data as Toolbag.Buildable
-		print("Buildable selected: %s" % [ buildable.zed_class ])
-
-		var instance := buildable.zed_class.instantiate()
-		var part_id := _bench.get_zed_host().add_part(instance, buildable.zed_class)
-		add_active(part_id)
+		build(data as Toolbag.Buildable)
