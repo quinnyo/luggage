@@ -14,7 +14,7 @@ var _holding: Dictionary[int, Placement3D]
 
 
 func is_registered() -> bool:
-	return _zeditor && _id
+	return _zeditor && _zeditor.module_is_registered(_id)
 
 
 func get_bench() -> Bench:
@@ -57,7 +57,6 @@ func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 		var req := _zeditor.request_activate_builder(_id, activation_channel, editable_id, activation_priority)
 		req.processed.connect(func(accepted: bool):
 			if accepted:
-				_module_activated()
 				_zeditor.module_grab(_id, editable_id)
 				_holding[editable_id] = placement
 				_module_editable_grabbed(editable_id)
@@ -72,6 +71,16 @@ func _module_on_zeditor_editable_deactivated(editable_id: int) -> void:
 	_module_editable_released(editable_id)
 	if _holding.is_empty():
 		_zeditor.module_deactivate(_id)
+
+
+func _zeditor_message(msg: Zeditor.Message) -> void:
+	if msg == Zeditor.Message.MODULE_REGISTERED:
+		_zeditor.editable_activated.connect(_module_on_zeditor_editable_activated)
+		_zeditor.editable_deactivated.connect(_module_on_zeditor_editable_deactivated)
+		_module_registered(_id, _zeditor)
+	elif msg == Zeditor.Message.MODULE_ACTIVATED:
+		_module_activated()
+	elif msg == Zeditor.Message.MODULE_DEACTIVATED:
 		_module_deactivated()
 
 
@@ -79,11 +88,8 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_ENTER_TREE:
 		_zeditor = get_parent() as Zeditor
 		_id = _zeditor.module_register(self)
-		_zeditor.editable_activated.connect(_module_on_zeditor_editable_activated)
-		_zeditor.editable_deactivated.connect(_module_on_zeditor_editable_deactivated)
-		_module_registered(_id, _zeditor)
 	elif what == NOTIFICATION_EXIT_TREE:
-		if _zeditor && _id:
+		if is_registered():
 			_zeditor.module_deregister(_id)
 			_zeditor.editable_activated.disconnect(_module_on_zeditor_editable_activated)
 			_zeditor.editable_deactivated.disconnect(_module_on_zeditor_editable_deactivated)

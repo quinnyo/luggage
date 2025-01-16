@@ -5,6 +5,12 @@ extends Node
 class ModuleInfo:
 	var id: int
 	var node: Node
+	## func(msg: Message) -> void
+	var fn_message: Callable
+
+	func send_message(msg: Message) -> void:
+		if fn_message.is_valid():
+			fn_message.call(msg)
 
 
 class EditableInfo:
@@ -115,6 +121,14 @@ class ActivateRequest:
 const ACTION_POINTER_ACTIVATE := &"pointer_activate"
 const ACTION_BUILD_MENU := &"build_menu"
 
+const METHOD_MESSAGE := &"_zeditor_message"
+
+enum Message {
+	MODULE_REGISTERED,
+	MODULE_DEREGISTERED,
+	MODULE_ACTIVATED,
+	MODULE_DEACTIVATED,
+}
 
 signal launching()
 signal halting()
@@ -253,7 +267,12 @@ func module_register(node: Node) -> int:
 	var module := ModuleInfo.new()
 	module.id = id
 	module.node = node
+	if node.has_method(METHOD_MESSAGE):
+		assert(node.get_method_argument_count(METHOD_MESSAGE) == 1)
+		module.fn_message = Callable(node, METHOD_MESSAGE)
 	modules[id] = module
+	module.node.process_mode = Node.PROCESS_MODE_DISABLED
+	module.send_message.call_deferred(Message.MODULE_REGISTERED)
 	return id
 
 
@@ -261,7 +280,12 @@ func module_deregister(id: int) -> void:
 	assert(modules.has(id))
 	if module_is_active(id):
 		module_deactivate(id)
+	module_get(id).send_message(Message.MODULE_DEREGISTERED)
 	modules.erase(id)
+
+
+func module_is_registered(id: int) -> bool:
+	return modules.has(id)
 
 
 func module_activate(id: int, channel: int) -> void:
@@ -269,6 +293,9 @@ func module_activate(id: int, channel: int) -> void:
 	assert(!module_is_active(id))
 	assert(channel_is_empty(channel))
 	channels.insert(channel, id)
+	var module := module_get(id)
+	module.send_message(Message.MODULE_ACTIVATED)
+	module.node.process_mode = Node.PROCESS_MODE_INHERIT
 
 
 ## removes the module from any channel it's active on
@@ -277,6 +304,9 @@ func module_deactivate(id: int) -> void:
 	if channels.has_right(id):
 		channels.erase_right(id)
 	module_release_all(id)
+	var module := module_get(id)
+	module.send_message(Message.MODULE_DEACTIVATED)
+	module.node.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 ## check if the module is active on any channel
@@ -365,13 +395,27 @@ func _build_menu() -> void:
 	item_tray.open()
 
 
+func _set_picked(object: Node) -> void:
+	if _picked == object:
+		return
+
+	if _picked:
+		_picked.hovered = false
+		_picked = null
+
+	if object is Placement3D:
+		var placement := object as Placement3D
+		placement.hovered = true
+		_picked = placement
+
+
 func _init() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
-func _ready() -> void:
+func _process(_delta: float) -> void:
 	var vpp := ViewportPlus.get_viewport_plus(self)
-	vpp.get_picking().picked.connect(_on_picking_picked)
+	_set_picked(vpp.get_picking().get_object())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -384,17 +428,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_active_placement_tree_exiting(editable_id: int, _placement: Placement3D) -> void:
 	if has_active(editable_id):
 		editable_set_placement(editable_id, null)
-
-
-func _on_picking_picked(object: Node) -> void:
-	if _picked:
-		_picked.hovered = false
-		_picked = null
-
-	if object is Placement3D:
-		var placement := object as Placement3D
-		placement.hovered = true
-		_picked = placement
 
 
 func _on_item_tray_item_selected(item_id: int) -> void:

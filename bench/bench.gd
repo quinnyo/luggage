@@ -109,6 +109,8 @@ func _end_phase_change() -> void:
 	_active_phase = _dest_phase
 	phase_change_completed.emit(_active_phase)
 	print("[Bench] changed to %s" % [ get_phase_string(_active_phase) ])
+	var vpp := ViewportPlus.get_viewport_plus(self)
+	vpp.get_picking().request_update()
 
 
 func _ready() -> void:

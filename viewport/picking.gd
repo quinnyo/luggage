@@ -150,13 +150,15 @@ var _request_update: bool = false
 
 func get_object() -> Node:
 	if _result.size():
-		return _result[0].object
+		var o := _result[0].object
+		return o if o && !o.is_queued_for_deletion() else null
 	return null
 
 
 ## Return true if a 3D object is picked.
 func has_object_3d() -> bool:
-	return _result.size() && _result[0].object is Node3D
+	var o := get_object()
+	return o && o is Node3D
 
 
 func get_object_3d() -> Node3D:
