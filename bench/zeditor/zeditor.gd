@@ -247,6 +247,7 @@ func channel_alloc() -> int:
 	return channel
 
 
+## Register a node as a module. Returns module ID.
 func module_register(node: Node) -> int:
 	var id := randi()
 	var module := ModuleInfo.new()
@@ -270,38 +271,45 @@ func module_activate(id: int, channel: int) -> void:
 	channels.insert(channel, id)
 
 
+## removes the module from any channel it's active on
+## and release all locks held by the module
 func module_deactivate(id: int) -> void:
 	if channels.has_right(id):
 		channels.erase_right(id)
 	module_release_all(id)
 
 
+## check if the module is active on any channel
 func module_is_active(id: int) -> bool:
 	return channels.has_right(id)
 
 
+## take exclusive control of the editable
 func module_grab(id: int, editable_id: int) -> void:
 	assert(!editable_is_locked(editable_id))
 	locks.insert(editable_id, id)
 
 
+## release module's lock on editable
 func module_release(id: int, editable_id: int) -> void:
 	assert(module_has_lock(id, editable_id))
 	locks.erase(editable_id, id)
 
 
-func module_has_lock(module: int, editable: int) -> bool:
-	return locks.has_pair(editable, module)
+## check if the module holds a lock on the editable
+func module_has_lock(module: int, editable_id: int) -> bool:
+	return locks.has_pair(editable_id, module)
+
+
+## release all locks held by the module
+func module_release_all(id: int) -> void:
+	if locks.has_right(id):
+		locks.erase_right(id)
 
 
 func module_get(id: int) -> ModuleInfo:
 	assert(modules.has(id))
 	return modules[id]
-
-
-func module_release_all(id: int) -> void:
-	if locks.has_right(id):
-		locks.erase_right(id)
 
 
 func request_activate_builder(module: int, channel: int, editable: int, priority: int = 0) -> ActivateRequest:
