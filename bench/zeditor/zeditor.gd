@@ -156,8 +156,6 @@ func setup_context(bench: Bench) -> void:
 	_bench = bench
 	_workspace = _bench.get_workspace()
 
-	_bench.get_zed_host().part_removed.connect(_on_zed_host_part_removed)
-
 	# NOTE: Cheating here for testing -- toolbag is to be initialised externally and passed to Zeditor.
 	for zc in _bench.get_zed_class_table().get_classes():
 		toolbag.add_buildable(zc)
@@ -169,6 +167,7 @@ func launch() -> void:
 	item_tray.clear()
 	_populate_item_picker()
 	item_tray.item_selected.connect(_on_item_tray_item_selected)
+	_bench.get_zed_host().part_removed.connect(_on_zed_host_part_removed)
 	launching.emit()
 	process_mode = Node.PROCESS_MODE_INHERIT
 
@@ -177,6 +176,7 @@ func halt() -> void:
 	clear_active()
 	if item_tray && item_tray.item_selected.is_connected(_on_item_tray_item_selected):
 		item_tray.item_selected.disconnect(_on_item_tray_item_selected)
+	_bench.get_zed_host().part_removed.disconnect(_on_zed_host_part_removed)
 	halting.emit()
 	process_mode = Node.PROCESS_MODE_DISABLED
 
