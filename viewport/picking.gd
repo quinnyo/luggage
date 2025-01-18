@@ -81,8 +81,6 @@ class Candidate:
 	## Client-use field
 	var userdata: Variant
 
-	var query: Query
-
 	func _to_string() -> String:
 		return "Picking.Candidate: object=%s, dxy=%0.2f, dz=%0.2f, userdata=%s" % [ object, dxy, dz, userdata ]
 
@@ -112,7 +110,6 @@ class Query:
 
 	func submit_candidate_3d(object: Node, dxy: float, dz: float, userdata: Variant = null) -> void:
 		var candidate := Candidate.create(object, dxy, dz, userdata)
-		candidate.query = self
 		_candidates.insert(_candidates.bsearch_custom(candidate, Candidate.sort_dxy), candidate)
 
 	## Get the candidates with a dxy score no greater than [param max_dxy].
