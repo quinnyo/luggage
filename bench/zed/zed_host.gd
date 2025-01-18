@@ -30,7 +30,7 @@ func get_all_part_ids() -> PackedInt64Array:
 	return PackedInt64Array(_parts.keys())
 
 
-func get_part_instance(part_id: int) -> Node:
+func get_part_instance(part_id: int) -> ZedPart:
 	return _get_part(part_id).instance
 
 
@@ -47,7 +47,7 @@ func has_part(part_id: int) -> bool:
 	return _parts.has(part_id)
 
 
-## callable is func(part_id: int, instance: Node, zed_class: ZedClass)
+## callable is func(part_id: int, instance: ZedPart, zed_class: ZedClass)
 func for_each_part(callable: Callable) -> void:
 	for box in _parts.values():
 		callable.call(box.id, box.instance, box.zed_class)
@@ -57,8 +57,6 @@ func clear() -> void:
 	for part_id in _parts.keys():
 		remove_part(part_id)
 	_parts_by_instance_id.clear()
-	for node in get_children():
-		node.queue_free()
 
 
 ## Allocate a unique part ID
@@ -69,12 +67,10 @@ func alloc_part_id() -> int:
 
 
 ## Insert a part with the specified ID. The node will be parented to the host.
-func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
+func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	assert(!_parts.has(id))
 	assert(id != 0)
 	_id_next = maxi(_id_next, id + 1)
-	add_child(instance)
-	instance.owner = self
 	var box := PartBox.new()
 	box.id = id
 	box.instance = instance
@@ -88,7 +84,7 @@ func insert_part(id: int, instance: Node, zed_class: _ZedClass) -> void:
 
 ## Add a part instance to the scene. The node will be parented to the host.
 ## The return value is a unique ID that can be used to refer to the part.
-func add_part(instance: Node, zed_class: _ZedClass) -> int:
+func add_part(instance: ZedPart, zed_class: _ZedClass) -> int:
 	var id := alloc_part_id()
 	insert_part(id, instance, zed_class)
 	return id
@@ -98,13 +94,12 @@ func remove_part(part_id: int) -> void:
 	var part := _get_part(part_id)
 	_clear_shell(part)
 	_parts_by_instance_id.erase(part.instance.get_instance_id())
-	remove_child(part.instance)
 	part.id = 0
 	_parts.erase(part_id)
 	part_removed.emit(part_id)
 
 
-func notify_part_changed(instance: Node) -> void:
+func notify_part_changed(instance: ZedPart) -> void:
 	assert(_parts_by_instance_id.has(instance.get_instance_id()))
 	var part := _parts_by_instance_id[instance.get_instance_id()]
 	_clear_shell(part)
@@ -145,6 +140,6 @@ func _on_shell_disappearing(_type: Zed.ShellType) -> void:
 
 class PartBox:
 	var id: int
-	var instance: Node
+	var instance: ZedPart
 	var zed_class: _ZedClass
 	var shell_id: int

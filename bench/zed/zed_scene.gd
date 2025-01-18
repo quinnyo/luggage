@@ -96,7 +96,36 @@ func restore(host: ZedHost) -> void:
 		_restore_part(host, _used_types[obj[OBJ_TYPE]], obj[OBJ_DATA], obj[OBJ_ID])
 
 
-func add_part(part_id: int, instance: Node, type: ZedClass) -> void:
+func part_count() -> int:
+	return _objects.size()
+
+
+func get_part_id(idx: int) -> int:
+	assert(idx >= 0 && idx < _objects.size())
+	var obj := _objects[idx]
+	return obj[OBJ_ID]
+
+
+## Deserialise the part instance [param idx]
+func get_part_instance(idx: int) -> ZedPart:
+	assert(idx >= 0 && idx < _objects.size())
+	var obj := _objects[idx]
+	var zclass := _used_types[obj[OBJ_TYPE]]
+	var inst := zclass.instantiate()
+	zclass.deserialise(inst, obj[OBJ_DATA])
+	var id: int = obj[OBJ_ID]
+	inst.id = id
+	return inst
+
+
+func get_part_class(idx: int) -> ZedClass:
+	assert(idx >= 0 && idx < _objects.size())
+	var obj := _objects[idx]
+	var zclass := _used_types[obj[OBJ_TYPE]]
+	return zclass
+
+
+func add_part(part_id: int, instance: ZedPart, type: ZedClass) -> void:
 	assert(type)
 	var type_id := use_type(type)
 	_objects.push_back({

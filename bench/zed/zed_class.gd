@@ -27,23 +27,23 @@ func get_type_name() -> StringName:
 	return _zed_get_type_name()
 
 
-func instantiate() -> Node:
+func instantiate() -> ZedPart:
 	return _zed_instantiate()
 
 
-func serialise(inst: Node) -> Variant:
+func serialise(inst: ZedPart) -> Variant:
 	return _zed_serialise(inst)
 
 
-func deserialise(inst: Node, data) -> Error:
+func deserialise(inst: ZedPart, data) -> Error:
 	return _zed_deserialise(inst, data)
 
 
-func part_registered(inst: Node, part_id: int, host: ZedHost) -> void:
+func part_registered(inst: ZedPart, part_id: int, host: ZedHost) -> void:
 	_zed_part_registered(inst, part_id, host)
 
 
-func create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
+func create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
 	return _zed_create_shell(inst, shell_type)
 
 
@@ -62,30 +62,30 @@ func _zed_get_type_name() -> StringName:
 	return ResourceUID.id_to_text(ResourceLoader.get_resource_uid(script.resource_path))
 
 
-func _zed_instantiate() -> Node:
+func _zed_instantiate() -> ZedPart:
 	push_error("Not implemented!")
 	return null
 
 
 @warning_ignore("unused_parameter")
-func _zed_serialise(inst: Node) -> Variant:
+func _zed_serialise(inst: ZedPart) -> Variant:
 	push_error("Not implemented!")
 	return null
 
 
 @warning_ignore("unused_parameter")
-func _zed_deserialise(inst: Node, data) -> Error:
+func _zed_deserialise(inst: ZedPart, data) -> Error:
 	push_error("Not implemented!")
 	return FAILED
 
 
 @warning_ignore("unused_parameter")
-func _zed_part_registered(inst: Node, part_id: int, host: ZedHost) -> void:
+func _zed_part_registered(inst: ZedPart, part_id: int, host: ZedHost) -> void:
 	return
 
 
 @warning_ignore("unused_parameter")
-func _zed_create_shell(inst: Node, shell_type: Zed.ShellType) -> Array[Node]:
+func _zed_create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
 	push_error("Not implemented!")
 	return []
 

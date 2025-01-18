@@ -396,7 +396,7 @@ func redo() -> void:
 		print("nothing to redo")
 
 
-func _build_part(part_id: int, instance: Node, buildable: Toolbag.Buildable) -> void:
+func _build_part(part_id: int, instance: ZedPart, buildable: Toolbag.Buildable) -> void:
 	_bench.get_zed_host().insert_part(part_id, instance, buildable.zed_class)
 	clear_active()
 	add_active(part_id)

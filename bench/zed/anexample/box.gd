@@ -1,4 +1,4 @@
-extends Node
+extends ZedPart
 
 
 @export var size: Vector3 = Vector3.ONE
