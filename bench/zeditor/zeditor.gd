@@ -366,13 +366,11 @@ func pointer_activate() -> void:
 
 ## Create a new instance of the buildable part
 func build(buildable: Toolbag.Buildable) -> void:
-	var part_id := _bench.get_zed_host().alloc_part_id()
-	var instance := buildable.zed_class.instantiate()
-	unre.create_action("build %s" % [ buildable.zed_class ])
-	unre.add_do_method(_build_part.bind(part_id, instance, buildable))
-	unre.add_do_reference(instance)
-	unre.add_undo_method(_unbuild_part.bind(part_id))
-	unre.commit_action()
+	var op := ZedOperationBuild.new()
+	op.buildable = buildable
+	op.bind(_bench)
+	if op.is_ok():
+		execute_operation(op)
 
 
 func open_toolbag() -> void:
@@ -400,18 +398,6 @@ func redo() -> void:
 func execute_operation(op: ZedOperation) -> void:
 	assert(op.is_ok())
 	op.commit(unre)
-
-
-func _build_part(part_id: int, instance: ZedPart, buildable: Toolbag.Buildable) -> void:
-	_bench.get_zed_host().insert_part(part_id, instance, buildable.zed_class)
-	clear_active()
-	add_active(part_id)
-
-
-func _unbuild_part(part_id: int) -> void:
-	if has_active(part_id):
-		remove_active(part_id)
-	_bench.get_zed_host().remove_part(part_id)
 
 
 func _process_builder_requests() -> void:
