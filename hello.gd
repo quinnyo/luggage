@@ -71,11 +71,15 @@ func _break_overlap() -> void:
 
 
 func _delete_one() -> void:
-	if _parts.size():
-		var id := _parts[-1]
-		_parts.remove_at(_parts.size() - 1)
-		var host := bench.get_zed_host()
-		host.remove_part(id)
+	var parts := bench.get_zed_host().get_all_part_ids()
+	if parts.is_empty():
+		return
+	var id := parts[randi() % parts.size()]
+	var op := ZedOperationErase.new()
+	op.targets = PackedInt64Array([id])
+	op.bind(bench)
+	if op.is_ok():
+		zeditor.execute_operation(op)
 
 
 func _on_part_placement_conflict_added(_part_id: int, conflict_id: int, data: Dictionary[StringName, Variant]) -> void:
