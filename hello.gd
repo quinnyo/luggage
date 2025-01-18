@@ -9,6 +9,7 @@ const PHASE_NAME_RUN := &"Run"
 @export var types: Array[Script] = []
 
 @onready var bench: Bench = $Bench
+@onready var zeditor: Zeditor = $Bench/Zeditor
 
 var _build_types: Array[StringName]
 var _data
@@ -30,23 +31,26 @@ func _unpack() -> void:
 	print("================================================================================")
 	print("unpacking ZedScene...")
 	print_rich(_data)
-	var host := bench.get_zed_host()
-	if host.get_part_count():
-		_clear()
 	var scene := ZedScene.new()
 	scene.class_table = bench.get_zed_class_table()
 	scene.deserialise(_data)
 	print("----------------------------------------")
 	print("restoring scene...")
-	scene.restore(host)
-	_parts = host.get_all_part_ids()
+	var op := ZedOperationSceneRestore.new()
+	op.dest = scene
+	op.bind(bench)
+	if op.is_ok():
+		zeditor.execute_operation(op)
+	_parts = bench.get_zed_host().get_all_part_ids()
 	print("================================================================================")
 
 
 func _clear() -> void:
 	print("clearing...")
-	bench.get_zed_host().clear()
-	_parts.clear()
+	var op := ZedOperationSceneClear.new()
+	op.bind(bench)
+	if op.is_ok():
+		zeditor.execute_operation(op)
 
 
 func _make_overlap() -> void:
@@ -129,6 +133,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			_break_overlap()
 		elif event.is_action_pressed(&"ui_text_delete"):
 			_delete_one()
+		elif event.is_action_pressed(&"ui_down"):
+			print("clearing unre history... (%d)" % [ zeditor.unre.get_history_count() ])
+			zeditor.unre.clear_history()
 		elif event is InputEventKey:
 			var kev := event as InputEventKey
 			if kev.keycode >= KEY_0 && kev.keycode <= KEY_9 && kev.pressed:

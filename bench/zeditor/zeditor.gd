@@ -396,6 +396,12 @@ func redo() -> void:
 		print("nothing to redo")
 
 
+## commit an operation immediately.
+func execute_operation(op: ZedOperation) -> void:
+	assert(op.is_ok())
+	op.commit(unre)
+
+
 func _build_part(part_id: int, instance: ZedPart, buildable: Toolbag.Buildable) -> void:
 	_bench.get_zed_host().insert_part(part_id, instance, buildable.zed_class)
 	clear_active()
