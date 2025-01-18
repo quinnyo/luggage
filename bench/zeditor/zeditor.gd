@@ -226,6 +226,12 @@ func clear_active() -> void:
 	_active.clear()
 
 
+func replace_active_array(array: PackedInt64Array) -> void:
+	clear_active()
+	for id in array:
+		add_active(id)
+
+
 func editable_set_placement(editable_id: int, placement: Placement3D) -> void:
 	assert(has_active(editable_id))
 	var editable := _active[editable_id]
@@ -351,6 +357,13 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 	return req
 
 
+func pointer_activate() -> void:
+	if _picked:
+		replace_active_array(PackedInt64Array([_picked.part_id]))
+	else:
+		replace_active_array(PackedInt64Array())
+
+
 ## Create a new instance of the buildable part
 func build(buildable: Toolbag.Buildable) -> void:
 	var part_id := _bench.get_zed_host().alloc_part_id()
@@ -360,6 +373,27 @@ func build(buildable: Toolbag.Buildable) -> void:
 	unre.add_do_reference(instance)
 	unre.add_undo_method(_unbuild_part.bind(part_id))
 	unre.commit_action()
+
+
+func open_toolbag() -> void:
+	assert(item_tray)
+	item_tray.open()
+
+
+func undo() -> void:
+	if unre.has_undo():
+		print("undo '%s'" % [ unre.get_current_action_name() ])
+		unre.undo()
+	else:
+		print("nothing to undo")
+
+
+func redo() -> void:
+	if unre.has_redo():
+		print("redo '%s'" % [ unre.get_action_name(unre.get_current_action() + 1) ])
+		unre.redo()
+	else:
+		print("nothing to redo")
 
 
 func _build_part(part_id: int, instance: Node, buildable: Toolbag.Buildable) -> void:
@@ -410,17 +444,6 @@ func _populate_item_picker() -> void:
 		item_tray.item_set_userdata(item_id, buildable)
 
 
-func _pointer_activate() -> void:
-	clear_active()
-	if _picked:
-		add_active(_picked.part_id)
-
-
-func _build_menu() -> void:
-	assert(item_tray)
-	item_tray.open()
-
-
 func _set_picked(object: Node) -> void:
 	if _picked == object:
 		return
@@ -446,15 +469,17 @@ func _process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
-		_pointer_activate()
+		pointer_activate()
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
-		_build_menu()
+		open_toolbag()
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"ui_undo"):
-		print("undo")
-		unre.undo()
+		undo()
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"ui_redo"):
-		print("redo")
-		unre.redo()
+		redo()
+		get_viewport().set_input_as_handled()
 
 
 func _on_zed_host_part_removed(part_id: int) -> void:
