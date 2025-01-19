@@ -16,7 +16,6 @@ class ModuleInfo:
 class EditableInfo:
 	## Zed/Workspace part ID
 	var id: int
-	var placement: Placement3D
 
 
 class LRMap:
@@ -188,10 +187,12 @@ func halt() -> void:
 
 func get_active_placement(editable_id: int) -> Placement3D:
 	assert(has_active(editable_id))
-	var placement := _active[editable_id].placement
-	if not placement || placement.is_queued_for_deletion():
-		return null
-	return placement
+	var zhost := _bench.get_zed_host()
+	var shell_id := zhost.get_part_shell_id(editable_id)
+	for node in _workspace.shell_get_nodes(shell_id):
+		if node is Placement3D:
+			return node as Placement3D
+	return null
 
 
 func has_active(editable_id: int) -> bool:
@@ -203,21 +204,12 @@ func add_active(id: int) -> void:
 	var editable := EditableInfo.new()
 	editable.id = id
 	_active[id] = editable
-
-	var zhost := _bench.get_zed_host()
-	var shell_id := zhost.get_part_shell_id(id)
-	for node in _workspace.shell_get_nodes(shell_id):
-		if node is Placement3D:
-			editable_set_placement(id, node)
-			break
-
 	editable_activated.emit(id)
 	_process_builder_requests()
 
 
 func remove_active(editable_id: int) -> void:
 	assert(has_active(editable_id))
-	editable_set_placement(editable_id, null)
 	if editable_is_locked(editable_id):
 		editable_unlock(editable_id)
 	editable_deactivated.emit(editable_id)
@@ -234,20 +226,6 @@ func replace_active_array(array: PackedInt64Array) -> void:
 	clear_active()
 	for id in array:
 		add_active(id)
-
-
-func editable_set_placement(editable_id: int, placement: Placement3D) -> void:
-	assert(has_active(editable_id))
-	var editable := _active[editable_id]
-	if editable.placement == placement:
-		return
-	elif editable.placement && !editable.placement.is_queued_for_deletion():
-		editable.placement.deactivate()
-		editable.placement.tree_exiting.disconnect(_on_active_placement_tree_exiting)
-	editable.placement = placement
-	if placement:
-		placement.activate()
-		placement.tree_exiting.connect(_on_active_placement_tree_exiting.bind(editable_id, placement))
 
 
 func editable_is_locked(editable: int) -> bool:
@@ -481,11 +459,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_zed_host_part_removed(part_id: int) -> void:
 	if has_active(part_id):
 		remove_active(part_id)
-
-
-func _on_active_placement_tree_exiting(editable_id: int, _placement: Placement3D) -> void:
-	if has_active(editable_id):
-		editable_set_placement(editable_id, null)
 
 
 func _on_item_tray_item_selected(item_id: int) -> void:
