@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://buqi7g7wjg4nn"]
+
+[ext_resource type="Script" uid="uid://g4konjqq70rx" path="res://bench/zed/anexample/box_inspector_build_panel.gd" id="1_ca4j8"]
+
+[node name="BoxInspectorBuildPanel" type="BoxContainer"]
+offset_right = 1152.0
+offset_bottom = 648.0
+vertical = true
+script = ExtResource("1_ca4j8")
+
+[node name="Title" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HeaderMedium"
+text = "Example Box"
+horizontal_alignment = 1
+
+[node name="Heading" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "anexample Box ~ Build Panel"
+horizontal_alignment = 1
+
+[node name="Randomise" type="Button" parent="."]
+layout_mode = 2
+text = "Randomise [Dice]"
+
+[connection signal="pressed" from="Randomise" to="." method="_on_randomise_pressed"]

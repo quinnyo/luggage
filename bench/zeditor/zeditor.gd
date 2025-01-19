@@ -143,6 +143,7 @@ signal editable_deactivated(editable_id: int)
 @export var item_tray: ItemPicker
 
 var unre: UndoRedo = UndoRedo.new()
+var inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 
 var _bench: Bench
 var _workspace: Workspace
@@ -159,6 +160,7 @@ var locks: LRMap = LRMap.new()
 func setup_context(bench: Bench) -> void:
 	_bench = bench
 	_workspace = _bench.get_workspace()
+	inspector_man.setup(_bench, self)
 
 	# NOTE: Cheating here for testing -- toolbag is to be initialised externally and passed to Zeditor.
 	for zc in _bench.get_zed_class_table().get_classes():
