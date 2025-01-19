@@ -23,44 +23,48 @@ class LRMap:
 	var lpairs: Dictionary[int, Dictionary]
 	var rpairs: Dictionary[int, Dictionary]
 
-	func has_left(l: Variant) -> bool:
+	func has_left(l: int) -> bool:
 		return lpairs.has(l) && lpairs[l].size()
 
-	func has_right(r: Variant) -> bool:
+	func has_right(r: int) -> bool:
 		return rpairs.has(r) && rpairs[r].size()
 
-	func get_partners_left(l: Variant) -> Array:
+	func get_partners_left(l: int) -> Array[int]:
 		assert(has_left(l))
 		return lpairs[l].keys()
 
-	func get_partners_right(r: Variant) -> Array:
+	func get_partners_right(r: int) -> Array[int]:
 		assert(has_right(r))
 		return rpairs[r].keys()
 
-	func insert(l: Variant, r: Variant, data: Variant = null) -> void:
-		lpairs.get_or_add(l, {})[r] = data
-		rpairs.get_or_add(r, {})[l] = data
+	func insert(l: int, r: int, data: Variant = null) -> void:
+		lpairs.get_or_add(l, _create_value_dict())[r] = data
+		rpairs.get_or_add(r, _create_value_dict())[l] = data
 
-	func has_pair(l: Variant, r: Variant) -> bool:
+	func has_pair(l: int, r: int) -> bool:
 		return lpairs.has(l) && lpairs[l].has(r)
 
-	func get_data(l: Variant, r: Variant) -> Variant:
+	func get_data(l: int, r: int) -> Variant:
 		assert(has_pair(l, r))
 		return lpairs[l][r]
 
-	func erase(l: Variant, r: Variant) -> void:
+	func erase(l: int, r: int) -> void:
 		assert(lpairs.has(l) && lpairs[l].has(r))
 		assert(rpairs.has(r) && rpairs[r].has(l))
 		lpairs[l].erase(r)
 		rpairs[r].erase(l)
 
-	func erase_left(l: Variant) -> void:
+	func erase_left(l: int) -> void:
 		for r in get_partners_left(l):
 			erase(l, r)
 
-	func erase_right(r: Variant) -> void:
+	func erase_right(r: int) -> void:
 		for l in get_partners_right(r):
 			erase(l, r)
+
+	static func _create_value_dict() -> Dictionary[int, Variant]:
+		var dict: Dictionary[int, Variant] = {}
+		return dict
 
 
 class ActivateRequest:
