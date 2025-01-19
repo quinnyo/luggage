@@ -12,7 +12,6 @@ const _ZedClass := preload("zed_class.gd")
 
 var _bench: Bench
 var _parts: Dictionary[int, PartBox]
-var _parts_by_instance_id: Dictionary[int, PartBox]
 var _id_next: int = 1
 
 
@@ -56,7 +55,6 @@ func for_each_part(callable: Callable) -> void:
 func clear() -> void:
 	for part_id in _parts.keys():
 		remove_part(part_id)
-	_parts_by_instance_id.clear()
 
 
 ## Allocate a unique part ID
@@ -76,7 +74,6 @@ func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	box.instance = instance
 	box.zed_class = zed_class
 	_parts[id] = box
-	_parts_by_instance_id[instance.get_instance_id()] = box
 	zed_class.part_registered(instance, id, self)
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
 	part_added.emit(id)
@@ -93,15 +90,13 @@ func add_part(instance: ZedPart, zed_class: _ZedClass) -> int:
 func remove_part(part_id: int) -> void:
 	var part := _get_part(part_id)
 	_clear_shell(part)
-	_parts_by_instance_id.erase(part.instance.get_instance_id())
 	part.id = 0
 	_parts.erase(part_id)
 	part_removed.emit(part_id)
 
 
-func notify_part_changed(instance: ZedPart) -> void:
-	assert(_parts_by_instance_id.has(instance.get_instance_id()))
-	var part := _parts_by_instance_id[instance.get_instance_id()]
+func notify_part_changed(part_id: int) -> void:
+	var part := _get_part(part_id)
 	_clear_shell(part)
 	_create_shell(part, _bench.get_workspace().get_active_shell_type())
 

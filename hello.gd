@@ -58,7 +58,7 @@ func _make_overlap() -> void:
 		var box0 := host.get_part_instance(_parts[0])
 		var box1 := host.get_part_instance(_parts[1])
 		box1.position = box0.position
-		host.notify_part_changed(box1)
+		host.notify_part_changed(_parts[1])
 
 
 func _break_overlap() -> void:
@@ -67,7 +67,7 @@ func _break_overlap() -> void:
 		var box0 := host.get_part_instance(_parts[0])
 		var box1 := host.get_part_instance(_parts[1])
 		box1.position = box0.position - box0.size - box1.size
-		host.notify_part_changed(box1)
+		host.notify_part_changed(_parts[1])
 
 
 func _delete_one() -> void:
