@@ -455,12 +455,10 @@ func _set_picked(object: Node) -> void:
 		return
 
 	if _picked:
-		_picked.hovered = false
 		_picked = null
 
 	if object is Placement3D:
 		var placement := object as Placement3D
-		placement.hovered = true
 		_picked = placement
 
 
