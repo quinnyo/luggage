@@ -474,10 +474,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
 		open_toolbag()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(&"ui_undo"):
+	elif event.is_action_pressed(&"ui_undo", false, true):
 		undo()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(&"ui_redo"):
+	elif event.is_action_pressed(&"ui_redo", false, true):
 		redo()
 		get_viewport().set_input_as_handled()
 
