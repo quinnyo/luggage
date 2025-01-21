@@ -16,58 +16,57 @@ signal part_placement_conflict_added(part_id: int, conflict_id: int, data: Dicti
 signal part_placement_conflict_removed(part_id: int, conflict_id: int, data: Dictionary[StringName, Variant])
 
 
-var _shells: Array[_WorkspaceShellLayer]
+var _layers: Array[_WorkspaceShellLayer]
 var _placement_conflicts: Dictionary[int, Dictionary]
 
 
 func push_shell_layer(shell_type: int) -> void:
-	if _shells.size() > 0:
-		_notify_shell_disappearing(_shell_top())
+	if has_active_shell():
+		_notify_shell_disappearing(_shell_stack_top())
 	var layer := _WorkspaceShellLayer.new()
 	layer.shell_type = shell_type
-	_shells.push_back(layer)
+	_layers.push_back(layer)
 	_notify_shell_appearing(layer)
 	add_child(layer)
 
 
 func pop_shell_layer() -> void:
-	assert(has_shell())
-	var top := _shell_top()
+	if _shell_stack_is_empty():
+		push_error("Nothing to pop. Stack is empty.")
+		return
+	var top := _shell_stack_top()
 	_notify_shell_disappearing(top)
-	_shells.pop_back()
+	_layers.pop_back()
 	top.queue_free()
-	if has_shell():
-		_notify_shell_appearing(_shell_top())
+	if !_shell_stack_is_empty():
+		_notify_shell_appearing(_shell_stack_top())
 
 
+func has_active_shell() -> bool:
+	return !_shell_stack_is_empty()
+
+
+## returns [code]-1[/code] if there is no active shell layer
 func get_active_shell_type() -> int:
-	if _shells.is_empty():
+	if _shell_stack_is_empty():
 		return -1
-	return _shell_top().shell_type
+	return _shell_stack_top().shell_type
 
 
 func shell_create_owner() -> int:
-	assert(has_shell())
-	return _shell_top().create_shell()
+	return _shell_stack_top().create_shell()
 
 
 func shell_add_node(shell_id: int, shell_node: Node) -> void:
-	assert(has_shell())
-	_shell_top().add_shell_node(shell_id, shell_node)
+	_shell_stack_top().add_shell_node(shell_id, shell_node)
 
 
 func shell_get_nodes(shell_id: int) -> Array[Node]:
-	assert(has_shell())
-	return _shell_top().get_shell_nodes(shell_id)
+	return _shell_stack_top().get_shell_nodes(shell_id)
 
 
 func shell_remove(shell_id: int) -> void:
-	assert(has_shell())
-	_shell_top().remove_shell(shell_id)
-
-
-func has_shell() -> bool:
-	return _shells.size() > 0
+	_shell_stack_top().remove_shell(shell_id)
 
 
 ## Configures [param volume] as part placement volume for [param part_id].
@@ -109,9 +108,13 @@ func part_has_placement_conflict(part_id: int) -> bool:
 	return !_placement_conflicts[part_id].is_empty()
 
 
-func _shell_top() -> _WorkspaceShellLayer:
-	assert(_shells.size() > 0)
-	return _shells[-1]
+func _shell_stack_is_empty() -> bool:
+	return _layers.is_empty()
+
+
+func _shell_stack_top() -> _WorkspaceShellLayer:
+	assert(_layers.size() > 0)
+	return _layers[-1]
 
 
 func _notify_shell_appearing(layer: _WorkspaceShellLayer) -> void:
