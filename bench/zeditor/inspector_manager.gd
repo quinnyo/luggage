@@ -36,7 +36,7 @@ func has_part_inspector(part_id: int) -> bool:
 
 func open_part_inspector(part_id: int) -> ZedInspector:
 	var boxed := _get_or_create_part_inspector(part_id)
-	boxed.inspector.setup(part_id)
+	boxed.inspector.clear_sections()
 	boxed.show()
 	return boxed.inspector
 
@@ -73,6 +73,7 @@ func _get_or_create_part_inspector(part_id: int) -> BoxedInspector:
 		boxed.fn_show = window.popup
 		boxed.fn_hide = window.hide
 		inspectors[part_id] = boxed
+		boxed.inspector.setup(part_id)
 		return boxed
 
 

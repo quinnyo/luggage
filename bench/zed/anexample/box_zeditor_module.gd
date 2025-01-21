@@ -23,10 +23,9 @@ func _module_deactivated() -> void:
 
 func _module_editable_grabbed(editable_id: int) -> void:
 	print("BoxZeditorModule: grabbed(%s)" % [ editable_id ])
-	var inspector := _zeditor.inspector_man.open_part_inspector(editable_id)
+	var inspector := _zeditor.open_part_inspector(editable_id)
 	inspector.add_control(ZedInspector.LayoutArea.PAGE_BUILD, BoxInspectorBuildPanel.instantiate())
 
 
 func _module_editable_released(editable_id: int) -> void:
 	print("BoxZeditorModule: released(%s)" % [ editable_id ])
-	_zeditor.inspector_man.close_part_inspector(editable_id)

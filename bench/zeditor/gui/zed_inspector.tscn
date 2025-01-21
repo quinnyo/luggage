@@ -38,15 +38,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Locate" type="Button" parent="MarginContainer/BoxContainer/Toolbar/ToolbarLeft"]
-layout_mode = 2
-text = "Locate"
-
 [node name="ToolbarRight" type="BoxContainer" parent="MarginContainer/BoxContainer/Toolbar"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 10
-
-[node name="Erase" type="Button" parent="MarginContainer/BoxContainer/Toolbar/ToolbarRight"]
-layout_mode = 2
-text = "Erase"

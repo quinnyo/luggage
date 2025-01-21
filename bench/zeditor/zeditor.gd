@@ -137,16 +137,17 @@ signal launching()
 signal halting()
 signal editable_activated(editable_id: int)
 signal editable_deactivated(editable_id: int)
+signal inspector_opening(inspector: ZedInspector)
 
 
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
 
 var unre: UndoRedo = UndoRedo.new()
-var inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 
 var _bench: Bench
 var _workspace: Workspace
+var _inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 
 var _picked: Placement3D
 var _active: Dictionary[int, EditableInfo]
@@ -160,7 +161,7 @@ var locks: LRMap = LRMap.new()
 func setup_context(bench: Bench) -> void:
 	_bench = bench
 	_workspace = _bench.get_workspace()
-	inspector_man.setup(_bench, self)
+	_inspector_man.setup(_bench, self)
 
 	# NOTE: Cheating here for testing -- toolbag is to be initialised externally and passed to Zeditor.
 	for zc in _bench.get_zed_class_table().get_classes():
@@ -206,12 +207,14 @@ func add_active(id: int) -> void:
 	var editable := EditableInfo.new()
 	editable.id = id
 	_active[id] = editable
+	open_part_inspector(id)
 	editable_activated.emit(id)
 	_process_builder_requests()
 
 
 func remove_active(editable_id: int) -> void:
 	assert(has_active(editable_id))
+	close_part_inspector(editable_id)
 	if editable_is_locked(editable_id):
 		editable_unlock(editable_id)
 	editable_deactivated.emit(editable_id)
@@ -382,6 +385,27 @@ func redo() -> void:
 func execute_operation(op: ZedOperation) -> void:
 	assert(op.is_ok())
 	op.commit(unre)
+
+
+func open_part_inspector(editable_id: int) -> ZedInspector:
+	var inspector := _inspector_man.open_part_inspector(editable_id)
+
+	var erase_button := Button.new()
+	erase_button.text = "Erase"
+	erase_button.pressed.connect(func():
+		var op := ZedOperationErase.new()
+		op.targets = [ editable_id ]
+		op.bind(_bench)
+		execute_operation(op)
+	)
+	inspector.add_control(ZedInspector.LayoutArea.TOOLBAR_RIGHT, erase_button)
+
+	inspector_opening.emit(inspector)
+	return inspector
+
+
+func close_part_inspector(editable_id: int) -> void:
+	_inspector_man.close_part_inspector(editable_id)
 
 
 func _process_builder_requests() -> void:
