@@ -45,6 +45,8 @@ func close_part_inspector(part_id: int) -> void:
 	assert(has_part_inspector(part_id))
 	var boxed := _get_part_inspector(part_id)
 	boxed.hide()
+	boxed.host.queue_free()
+	inspectors.erase(part_id)
 
 
 func _get_part_inspector(part_id: int) -> BoxedInspector:
