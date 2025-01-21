@@ -152,6 +152,7 @@ var _inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 var _picked: Placement3D
 var _active: Dictionary[int, EditableInfo]
 var _builder_requests: Array[ActivateRequest] = []
+var _did_setup: bool = false
 
 var modules: Dictionary[int, ModuleInfo]
 var channels: LRMap = LRMap.new()
@@ -159,6 +160,10 @@ var locks: LRMap = LRMap.new()
 
 
 func setup_context(bench: Bench) -> void:
+	if _did_setup:
+		return
+	_did_setup = true
+
 	_bench = bench
 	_workspace = _bench.get_workspace()
 	_inspector_man.setup(_bench, self)
