@@ -3,7 +3,8 @@ extends Node
 
 
 ## The channel that this module occupies when activated.
-@export_range(0, 31) var activation_channel: int = 0
+## If set to [code]-1[/code] (the default), an empty channel is allocated automatically.
+@export_range(-1, 31, 1, "or_greater") var channel_override: int = -1
 
 @export var activation_priority: int = 0
 
@@ -54,7 +55,8 @@ func _module_editable_released(editable_id: int) -> void:
 func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 	var placement := _zeditor.get_active_placement(editable_id)
 	if _module_handles_editable(editable_id):
-		var req := _zeditor.request_activate_builder(_id, activation_channel, editable_id, activation_priority)
+		var channel := _zeditor.channel_alloc() if channel_override == -1 else channel_override
+		var req := _zeditor.request_activate_builder(_id, channel, editable_id, activation_priority)
 		req.processed.connect(func(accepted: bool):
 			if accepted:
 				_zeditor.module_grab(_id, editable_id)
