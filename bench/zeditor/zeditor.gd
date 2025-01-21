@@ -410,7 +410,8 @@ func open_part_inspector(editable_id: int) -> ZedInspector:
 
 
 func close_part_inspector(editable_id: int) -> void:
-	_inspector_man.close_part_inspector(editable_id)
+	if _inspector_man.has_part_inspector(editable_id):
+		_inspector_man.close_part_inspector(editable_id)
 
 
 func _process_builder_requests() -> void:
