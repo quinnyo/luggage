@@ -69,6 +69,25 @@ func _break_overlap() -> void:
 		host.notify_part_changed(parts[1])
 
 
+func _make_support() -> void:
+	var boxes := _find_boxes()
+	if boxes.is_empty():
+		return
+	var pos: Vector3 = %HelloSupport3D.global_position
+	boxes[0][1].position = pos
+	bench.get_zed_host().notify_part_changed(boxes[0][0])
+
+
+func _find_boxes() -> Array:
+	var result := []
+	var host := bench.get_zed_host()
+	host.for_each_part(func(part_id, zpart, zclass):
+		if zclass.get_type_name() == &"zed.example.Box":
+			result.push_back([part_id, zpart, zclass])
+	)
+	return result
+
+
 func _delete_one() -> void:
 	var parts := bench.get_zed_host().get_all_part_ids()
 	if parts.is_empty():
@@ -124,6 +143,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_make_overlap()
 		elif event.is_action_pressed(&"ui_page_up"):
 			_break_overlap()
+		elif event.is_action_pressed(&"ui_text_toggle_insert_mode"):
+			_make_support()
 		elif event.is_action_pressed(&"ui_text_delete"):
 			_delete_one()
 		elif event.is_action_pressed(&"ui_down"):

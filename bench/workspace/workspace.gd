@@ -4,9 +4,14 @@ extends Node3D
 
 
 const _WorkspaceShellLayer := preload("shell_layer.gd")
+const VolumeManager := preload("volume_manager.gd")
 
 const COLLISION_LAYER_PLACEMENT := 2
 const COLLISION_MASK_PLACEMENT := 3
+
+const K_PLACEMENT_PART_ID := &"part_id"
+
+const K_SUPPORT_CLIENTS := &"clients"
 
 
 signal shell_appearing(type: int)
@@ -15,9 +20,22 @@ signal shell_disappearing(type: int)
 signal part_placement_conflict_added(part_id: int, conflict_id: int, data: Dictionary[StringName, Variant])
 signal part_placement_conflict_removed(part_id: int, conflict_id: int, data: Dictionary[StringName, Variant])
 
+## Added a support-placement [param pair] to part [param part_id].
+## [br][param count] is the updated number of supports the part has.
+signal part_support_added(part_id: int, pair: int, count: int)
+## Removed a support-placement [param pair] from part [param part_id].
+## [br][param count] is the updated number of supports the part has.
+signal part_support_removed(part_id: int, pair: int, count: int)
+
+signal part_supported(part_id: int)
+signal part_unsupported(part_id: int)
 
 var _layers: Array[_WorkspaceShellLayer]
 var _placement_conflicts: Dictionary[int, Dictionary]
+var _volumes: VolumeManager = VolumeManager.new()
+var _placement_volumes: Dictionary[int, Dictionary]
+var _support_volumes: Dictionary[int, Dictionary]
+var _part_supports: Dictionary[int, Dictionary]
 
 
 func push_shell_layer(shell_type: int) -> void:
@@ -69,6 +87,20 @@ func shell_remove(shell_id: int) -> void:
 	_shell_stack_top().remove_shell(shell_id)
 
 
+## Configures [param volume] as a support volume.
+func register_support_volume(volume: Area3D) -> int:
+	volume.collision_layer = 0
+	volume.collision_mask = COLLISION_MASK_PLACEMENT
+	volume.monitorable = false
+	volume.monitoring = true
+	var id := _volumes.register_area_3d(volume)
+	var data: Dictionary[StringName, Variant] = {
+		K_SUPPORT_CLIENTS: {},
+	}
+	_support_volumes[id] = data
+	return id
+
+
 ## Configures [param volume] as part placement volume for [param part_id].
 func register_part_placement_volume(part_id: int, volume: Area3D) -> void:
 	volume.collision_layer = COLLISION_LAYER_PLACEMENT
@@ -77,6 +109,16 @@ func register_part_placement_volume(part_id: int, volume: Area3D) -> void:
 	volume.monitoring = true
 	volume.area_entered.connect(_on_part_placement_volume_area_entered.bind(part_id, volume))
 	volume.area_exited.connect(_on_part_placement_volume_area_exited.bind(part_id, volume))
+	var id := _volumes.register_area_3d(volume)
+	var data: Dictionary[StringName, Variant] = {
+		K_PLACEMENT_PART_ID: part_id,
+	}
+	_placement_volumes[id] = data
+
+
+func placement_get_part_id(volume_id: int) -> int:
+	assert(_placement_volumes.has(volume_id))
+	return _placement_volumes[volume_id][K_PLACEMENT_PART_ID]
 
 
 func part_placement_conflict_add(part_id: int, conflict_id: int, data: Dictionary[StringName, Variant]) -> void:
@@ -108,6 +150,26 @@ func part_has_placement_conflict(part_id: int) -> bool:
 	return !_placement_conflicts[part_id].is_empty()
 
 
+func part_support_add(part_id: int, pair: int, support_volume_id: int) -> void:
+	if _support_is_occupied(support_volume_id):
+		push_warning("support overloaded (part_id=%d, pair=%d, support_volume_id=%d)" % [ part_id, pair, support_volume_id ])
+	_support_volumes[support_volume_id][K_SUPPORT_CLIENTS][pair] = part_id
+	var supports := _part_supports[part_id]
+	supports[pair] = 1
+	part_support_added.emit(part_id, pair, supports.size())
+	if supports.size() == 1:
+		part_supported.emit(part_id)
+
+
+func part_support_remove(part_id: int, pair: int, support_volume_id: int) -> void:
+	_support_volumes[support_volume_id][K_SUPPORT_CLIENTS].erase(pair)
+	var supports := _part_supports[part_id]
+	supports.erase(pair)
+	part_support_removed.emit(part_id, pair, supports.size())
+	if supports.size() == 0:
+		part_unsupported.emit(part_id)
+
+
 func _shell_stack_is_empty() -> bool:
 	return _layers.is_empty()
 
@@ -126,6 +188,15 @@ func _notify_shell_disappearing(layer: _WorkspaceShellLayer) -> void:
 	layer.clear()
 
 
+func _support_is_occupied(support_volume_id: int) -> bool:
+	return _support_volumes[support_volume_id][K_SUPPORT_CLIENTS].size()
+
+
+func _init() -> void:
+	_volumes.volumes_overlapping.connect(_on_volumes_overlapping)
+	_volumes.volumes_separated.connect(_on_volumes_separated)
+
+
 func _on_part_placement_volume_area_entered(area: Area3D, part_id: int, volume: Area3D) -> void:
 	var conflict_id := hash(area.get_instance_id()) ^ hash(volume.get_instance_id())
 	var data: Dictionary[StringName, Variant] = {
@@ -138,3 +209,39 @@ func _on_part_placement_volume_area_entered(area: Area3D, part_id: int, volume: 
 func _on_part_placement_volume_area_exited(area: Area3D, part_id: int, volume: Area3D) -> void:
 	var conflict_id := hash(area.get_instance_id()) ^ hash(volume.get_instance_id())
 	part_placement_conflict_remove(part_id, conflict_id)
+
+
+func _on_support_volume_entered(pair: int, support_volume_id: int, other_volume_id: int) -> void:
+	if other_volume_id in _placement_volumes:
+		var part_id := placement_get_part_id(other_volume_id)
+		if !_part_supports.has(part_id):
+			_part_supports[part_id] = {}
+		part_support_add(part_id, pair, support_volume_id)
+
+
+func _on_support_volume_exited(pair: int, support_volume_id: int, other_volume_id: int) -> void:
+	if other_volume_id in _placement_volumes:
+		var part_id := placement_get_part_id(other_volume_id)
+		if !_part_supports.has(part_id):
+			return
+		part_support_remove(part_id, pair, support_volume_id)
+
+
+func _on_volumes_overlapping(pair: int, a_volume_id: int, b_volume_id) -> void:
+	if a_volume_id in _support_volumes:
+		_on_support_volume_entered(pair, a_volume_id, b_volume_id)
+	elif b_volume_id in _support_volumes:
+		_on_support_volume_entered(pair, b_volume_id, a_volume_id)
+	else:
+		# TODO: move placement conflict stuff here?
+		pass
+
+
+func _on_volumes_separated(pair: int, a_volume_id: int, b_volume_id) -> void:
+	if a_volume_id in _support_volumes:
+		_on_support_volume_exited(pair, a_volume_id, b_volume_id)
+	elif b_volume_id in _support_volumes:
+		_on_support_volume_exited(pair, b_volume_id, a_volume_id)
+	else:
+		# TODO: move placement conflict stuff here?
+		pass
