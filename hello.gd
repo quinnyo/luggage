@@ -12,7 +12,6 @@ const PHASE_NAME_RUN := &"Run"
 @onready var zeditor: Zeditor = $Bench/Zeditor
 
 var _data
-var _parts: PackedInt64Array
 
 
 func _pack() -> void:
@@ -40,12 +39,10 @@ func _unpack() -> void:
 	op.bind(bench)
 	if op.is_ok():
 		zeditor.execute_operation(op)
-	_parts = bench.get_zed_host().get_all_part_ids()
 	print("================================================================================")
 
 
 func _clear() -> void:
-	print("clearing...")
 	var op := ZedOperationSceneClear.new()
 	op.bind(bench)
 	if op.is_ok():
@@ -55,19 +52,21 @@ func _clear() -> void:
 func _make_overlap() -> void:
 	var host := bench.get_zed_host()
 	if host.get_part_count() >= 2:
-		var box0 := host.get_part_instance(_parts[0])
-		var box1 := host.get_part_instance(_parts[1])
+		var parts := bench.get_zed_host().get_all_part_ids()
+		var box0 := host.get_part_instance(parts[0])
+		var box1 := host.get_part_instance(parts[1])
 		box1.position = box0.position
-		host.notify_part_changed(_parts[1])
+		host.notify_part_changed(parts[1])
 
 
 func _break_overlap() -> void:
 	var host := bench.get_zed_host()
 	if host.get_part_count() >= 2:
-		var box0 := host.get_part_instance(_parts[0])
-		var box1 := host.get_part_instance(_parts[1])
+		var parts := bench.get_zed_host().get_all_part_ids()
+		var box0 := host.get_part_instance(parts[0])
+		var box1 := host.get_part_instance(parts[1])
 		box1.position = box0.position - box0.size - box1.size
-		host.notify_part_changed(_parts[1])
+		host.notify_part_changed(parts[1])
 
 
 func _delete_one() -> void:
