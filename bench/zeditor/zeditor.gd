@@ -149,7 +149,6 @@ var _bench: Bench
 var _workspace: Workspace
 var _inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 
-var _picked: Placement3D
 var _active: Dictionary[int, EditableInfo]
 var _builder_requests: Array[ActivateRequest] = []
 var _did_setup: bool = false
@@ -349,11 +348,16 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 	return req
 
 
-func pointer_activate() -> void:
-	if _picked:
-		replace_active_array(PackedInt64Array([_picked.part_id]))
-	else:
+## Returns [code]true[/code] if effective, or [code]false[/code] if nothing happened.
+func pointer_activate() -> bool:
+	if _workspace.is_part_picked():
+		replace_active_array(PackedInt64Array([_workspace.get_picked_part()]))
+		return true
+	elif _workspace.get_picked_node() == null:
+		# only deselect if there is nothing picked
 		replace_active_array(PackedInt64Array())
+		return true
+	return false
 
 
 ## Create a new instance of the buildable part
@@ -450,31 +454,14 @@ func _populate_item_picker() -> void:
 		item_tray.item_set_userdata(item_id, buildable)
 
 
-func _set_picked(object: Node) -> void:
-	if _picked == object:
-		return
-
-	if _picked:
-		_picked = null
-
-	if object is Placement3D:
-		var placement := object as Placement3D
-		_picked = placement
-
-
 func _init() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
-func _process(_delta: float) -> void:
-	var vpp := ViewportPlus.get_viewport_plus(self)
-	_set_picked(vpp.get_picking().get_object())
-
-
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
-		pointer_activate()
-		get_viewport().set_input_as_handled()
+		if pointer_activate():
+			get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
 		open_toolbag()
 		get_viewport().set_input_as_handled()

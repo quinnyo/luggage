@@ -30,6 +30,12 @@ signal part_support_removed(part_id: int, pair: int, count: int)
 signal part_supported(part_id: int)
 signal part_unsupported(part_id: int)
 
+signal pointer_entered_part(part_id: int)
+signal pointer_exited_part(part_id: int)
+
+
+var _picked: Node
+var _picked_volume: int
 var _layers: Array[_WorkspaceShellLayer]
 var _placement_conflicts: Dictionary[int, Dictionary]
 var _volumes: VolumeManager = VolumeManager.new()
@@ -170,6 +176,20 @@ func part_support_remove(part_id: int, pair: int, support_volume_id: int) -> voi
 		part_unsupported.emit(part_id)
 
 
+func get_picked_node() -> Node:
+	return _picked
+
+
+func is_part_picked() -> bool:
+	return _placement_volumes.has(_picked_volume)
+
+
+func get_picked_part() -> int:
+	if is_part_picked():
+		return _placement_volumes[_picked_volume][K_PLACEMENT_PART_ID]
+	return 0
+
+
 func _shell_stack_is_empty() -> bool:
 	return _layers.is_empty()
 
@@ -190,6 +210,29 @@ func _notify_shell_disappearing(layer: _WorkspaceShellLayer) -> void:
 
 func _support_is_occupied(support_volume_id: int) -> bool:
 	return _support_volumes[support_volume_id][K_SUPPORT_CLIENTS].size()
+
+
+func _set_picked(object: Node) -> void:
+	if _picked == object:
+		return
+
+	if _picked:
+		if is_part_picked():
+			pointer_exited_part.emit(get_picked_part())
+		_picked = null
+		_picked_volume = VolumeManager.ID_NONE
+
+	if object && is_ancestor_of(object) && object is Area3D:
+		_picked_volume = _volumes.find_volume_with_area(object)
+		if _picked_volume != VolumeManager.ID_NONE:
+			_picked = object
+			if is_part_picked():
+				pointer_entered_part.emit(get_picked_part())
+
+
+func _process(_delta: float) -> void:
+	var vpp := ViewportPlus.get_viewport_plus(self)
+	_set_picked(vpp.get_picking().get_object())
 
 
 func _init() -> void:
