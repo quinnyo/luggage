@@ -8,14 +8,19 @@ extends ZedPart
 
 var _part_id: int
 var _mesh: BoxMesh
+var _material: StandardMaterial3D
 
 
 func _create_visual() -> Node3D:
 	if not _mesh:
 		_mesh = BoxMesh.new()
 	_mesh.size = size
+	if not _material:
+		_material = StandardMaterial3D.new()
+		_material.albedo_color = Color(0.97, 0.96, 0.94)
 	var mi := MeshInstance3D.new()
 	mi.mesh = _mesh
+	mi.material_override = _material
 	return mi
 
 
