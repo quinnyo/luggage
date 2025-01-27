@@ -33,7 +33,13 @@ signal part_unsupported(part_id: int)
 signal pointer_entered_part(part_id: int)
 signal pointer_exited_part(part_id: int)
 
+signal pointer_3d_entered(pos: Vector3)
+signal pointer_3d_exited()
+signal pointer_3d_moved(pos: Vector3, delta: Vector3)
 
+
+var _pointer_3d_position: Vector3
+var _pointer_3d_is_present: bool = false
 var _picked: Node
 var _picked_volume: int
 var _layers: Array[_WorkspaceShellLayer]
@@ -174,6 +180,32 @@ func part_support_remove(part_id: int, pair: int, support_volume_id: int) -> voi
 	part_support_removed.emit(part_id, pair, supports.size())
 	if supports.size() == 0:
 		part_unsupported.emit(part_id)
+
+
+func pointer_3d_set_position(pos: Vector3) -> void:
+	var delta := pos - _pointer_3d_position
+	_pointer_3d_position = pos
+	if !pointer_3d_is_present():
+		pointer_3d_set_presence(true)
+	elif !delta.is_zero_approx():
+		pointer_3d_moved.emit(_pointer_3d_position, delta)
+
+
+func pointer_3d_set_presence(is_present: bool) -> void:
+	if _pointer_3d_is_present != is_present:
+		_pointer_3d_is_present = is_present
+		if is_present:
+			pointer_3d_entered.emit(_pointer_3d_position)
+		else:
+			pointer_3d_exited.emit()
+
+
+func pointer_3d_get_position() -> Vector3:
+	return _pointer_3d_position
+
+
+func pointer_3d_is_present() -> bool:
+	return _pointer_3d_is_present
 
 
 func get_picked_node() -> Node:

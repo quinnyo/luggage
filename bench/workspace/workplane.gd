@@ -15,6 +15,8 @@ enum Axis { X, Y, Z }
 @export var d_step: float = 1.0
 
 
+var _workspace: Workspace
+
 var _pointer_intersection_point: Vector3
 var _pointer_vis: Node3D
 var _plane_vis: Node3D
@@ -82,6 +84,8 @@ func _update_pointer() -> bool:
 		return false
 
 	var screen_point := vp.get_mouse_position()
+	if !vp.get_visible_rect().has_point(screen_point):
+		return false
 	var result := _intersect_camera_ray(screen_point, cam)
 	if result.size() == 1:
 		_pointer_intersection_point = result[0]
@@ -137,12 +141,21 @@ func _init() -> void:
 	add_child(_plane_vis)
 
 
+func _ready() -> void:
+	_workspace = get_parent() as Workspace
+	if not _workspace:
+		push_warning("Workplane requires Workspace parent")
+		process_mode = Node.PROCESS_MODE_DISABLED
+
+
 func _process(_delta: float) -> void:
 	if _update_pointer():
+		_workspace.pointer_3d_set_position(_pointer_intersection_point)
 		_pointer_vis.visible = true
 		_pointer_vis.global_basis = global_basis * get_plane_basis()
 		_pointer_vis.global_position = _pointer_intersection_point
 	else:
+		_workspace.pointer_3d_set_presence(false)
 		_pointer_vis.visible = false
 
 	_plane_vis.visible = false
