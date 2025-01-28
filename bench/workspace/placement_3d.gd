@@ -6,6 +6,11 @@ extends Area3D
 
 ## The ID of the part this belongs to
 var part_id: int
+## The sub-ID of this placement in the part
+var sub_id: int = -1
+
+
+var _volume_id: int
 
 
 func _enter_tree() -> void:
@@ -13,4 +18,4 @@ func _enter_tree() -> void:
 	while parent and parent is not Workspace:
 		parent = parent.get_parent()
 	var workspace := parent as Workspace
-	workspace.register_part_placement_volume(part_id, self)
+	_volume_id = workspace.register_part_placement_volume(part_id, self, sub_id)

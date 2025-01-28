@@ -10,6 +10,7 @@ const COLLISION_LAYER_PLACEMENT := 2
 const COLLISION_MASK_PLACEMENT := 3
 
 const K_PLACEMENT_PART_ID := &"part_id"
+const K_PLACEMENT_SUB_ID := &"sub_id"
 
 const K_SUPPORT_CLIENTS := &"clients"
 
@@ -114,7 +115,7 @@ func register_support_volume(volume: Area3D) -> int:
 
 
 ## Configures [param volume] as part placement volume for [param part_id].
-func register_part_placement_volume(part_id: int, volume: Area3D) -> void:
+func register_part_placement_volume(part_id: int, volume: Area3D, sub_id: int = -1) -> int:
 	volume.collision_layer = COLLISION_LAYER_PLACEMENT
 	volume.collision_mask = COLLISION_MASK_PLACEMENT
 	volume.monitorable = true
@@ -124,13 +125,25 @@ func register_part_placement_volume(part_id: int, volume: Area3D) -> void:
 	var id := _volumes.register_area_3d(volume)
 	var data: Dictionary[StringName, Variant] = {
 		K_PLACEMENT_PART_ID: part_id,
+		K_PLACEMENT_SUB_ID: sub_id,
 	}
 	_placement_volumes[id] = data
+	return id
 
 
 func placement_get_part_id(volume_id: int) -> int:
 	assert(_placement_volumes.has(volume_id))
 	return _placement_volumes[volume_id][K_PLACEMENT_PART_ID]
+
+
+func placement_set_sub_id(volume_id: int, sub_id: int) -> void:
+	var data: Dictionary[StringName, Variant] = _placement_volumes[volume_id]
+	data[K_PLACEMENT_SUB_ID] = sub_id
+
+
+func placement_get_sub_id(volume_id: int) -> int:
+	var data: Dictionary[StringName, Variant] = _placement_volumes[volume_id]
+	return data[K_PLACEMENT_SUB_ID]
 
 
 func part_placement_conflict_add(part_id: int, conflict_id: int, data: Dictionary[StringName, Variant]) -> void:
@@ -214,6 +227,10 @@ func get_picked_node() -> Node:
 
 func is_part_picked() -> bool:
 	return _placement_volumes.has(_picked_volume)
+
+
+func get_picked_placement() -> int:
+	return _picked_volume if _placement_volumes.has(_picked_volume) else VolumeManager.ID_NONE
 
 
 func get_picked_part() -> int:
