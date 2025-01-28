@@ -138,6 +138,9 @@ signal halting()
 signal editable_activated(editable_id: int)
 signal editable_deactivated(editable_id: int)
 signal inspector_opening(inspector: ZedInspector)
+signal operation_started(op: ZedOperation)
+signal operation_committing(op: ZedOperation)
+signal operation_ended(op: ZedOperation)
 
 
 @export var toolbag: Toolbag
@@ -393,7 +396,10 @@ func redo() -> void:
 ## commit an operation immediately.
 func execute_operation(op: ZedOperation) -> void:
 	assert(op.is_ok())
+	operation_started.emit(op)
+	operation_committing.emit(op)
 	op.commit(unre)
+	operation_ended.emit(op)
 
 
 func open_part_inspector(editable_id: int) -> ZedInspector:
