@@ -1,4 +1,4 @@
-class_name Selection extends RefCounted
+extends RefCounted
 ## Object selection state
 
 

@@ -1,5 +1,7 @@
 class_name ViewportPlus extends Viewport
 
+const Selection := preload("selection.gd")
+
 signal camera_3d_changed()
 
 var _camera_3d: Camera3D
