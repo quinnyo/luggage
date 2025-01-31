@@ -21,6 +21,13 @@ var _dest_phase: BenchPhase
 var _phases: Dictionary[StringName, BenchPhase]
 
 
+static func find_bench_parent(node: Node) -> Bench:
+	var parent := node.get_parent()
+	while parent && parent is not Bench:
+		parent = parent.get_parent()
+	return parent
+
+
 func get_zed_class_table() -> _ZedClassTable:
 	if not _zed_class_table:
 		_zed_class_table = _ZedClassTable.new()
