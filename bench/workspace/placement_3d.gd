@@ -9,13 +9,22 @@ var part_id: int
 ## The sub-ID of this placement in the part
 var sub_id: int = -1
 
+var armature_index: int = 0
+
 
 var _volume_id: int
+var _bench: Bench
 
 
 func _enter_tree() -> void:
+	_bench = Bench.find_bench_parent(self)
+
 	var parent := get_parent()
 	while parent and parent is not Workspace:
 		parent = parent.get_parent()
 	var workspace := parent as Workspace
 	_volume_id = workspace.register_part_placement_volume(part_id, self, sub_id)
+
+
+func _process(_delta: float) -> void:
+	transform = _bench.get_zed_host().part_armature_get_transform(part_id, armature_index)

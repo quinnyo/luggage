@@ -47,6 +47,10 @@ func create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
 	return _zed_create_shell(inst, shell_type)
 
 
+func create_armature(inst: ZedPart) -> ZedArmature:
+	return _zed_create_armature(inst)
+
+
 func get_buildable_name() -> String:
 	return _zed_get_buildable_name()
 
@@ -88,6 +92,11 @@ func _zed_part_registered(inst: ZedPart, part_id: int, host: ZedHost) -> void:
 func _zed_create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
 	push_error("Not implemented!")
 	return []
+
+
+@warning_ignore("unused_parameter")
+func _zed_create_armature(inst: ZedPart) -> ZedArmature:
+	return null
 
 
 func _zed_get_buildable_name() -> String:

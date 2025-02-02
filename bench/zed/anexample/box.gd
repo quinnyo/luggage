@@ -3,7 +3,9 @@ extends ZedPart
 
 @export var size: Vector3 = Vector3.ONE
 @export var density: float = 1.0
-@export var position: Vector3
+@export var position: Vector3:
+	set(value):
+		position = value.snapped(size / 2.0)
 
 
 var _part_id: int
@@ -31,8 +33,8 @@ func _create_edit() -> Node3D:
 	collider.shape = shape
 	var node := Placement3D.new()
 	node.part_id = _part_id
+	node.armature_index = 0
 	node.add_child(collider)
-	node.position = position
 	node.add_child(_create_visual())
 	return node
 

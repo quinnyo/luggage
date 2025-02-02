@@ -5,6 +5,22 @@ const TYPE_NAME := &"zed.example.Box"
 const _Box := preload("box.gd")
 
 
+class BoxArmature extends ZedArmature:
+	var inst: _Box
+
+	func _is_size_fixed() -> bool:
+		return true
+
+	func _size() -> int:
+		return 1
+
+	func _get_transform(_index: int) -> Transform3D:
+		return Transform3D(Basis.IDENTITY, inst.position)
+
+	func _set_transform(_index: int, value: Transform3D) -> void:
+		inst.position = value.origin
+
+
 func randf3() -> Vector3:
 	return Vector3(randf(), randf(), randf())
 
@@ -51,6 +67,12 @@ func _zed_create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
 	elif shell_type == Zed.ShellType.SIM:
 		return [ box._create_sim() ]
 	return []
+
+
+func _zed_create_armature(inst: ZedPart) -> ZedArmature:
+	var armature := BoxArmature.new()
+	armature.inst = inst
+	return armature
 
 
 func _zed_get_buildable_name() -> String:
