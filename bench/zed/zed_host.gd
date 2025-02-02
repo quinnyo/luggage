@@ -75,7 +75,7 @@ func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	box.zed_class = zed_class
 	box.armature = zed_class.create_armature(instance)
 	_parts[id] = box
-	zed_class.part_registered(instance, id, self)
+	zed_class.part_registered(instance, id)
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
 	part_added.emit(id)
 

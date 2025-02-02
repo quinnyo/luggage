@@ -55,7 +55,7 @@ func _zed_deserialise(inst: ZedPart, data) -> Error:
 	return OK
 
 
-func _zed_part_registered(inst: ZedPart, part_id: int, _host: ZedHost) -> void:
+func _zed_part_registered(inst: ZedPart, part_id: int) -> void:
 	var box := inst as _Box
 	box._part_id = part_id
 

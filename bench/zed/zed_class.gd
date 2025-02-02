@@ -39,8 +39,8 @@ func deserialise(inst: ZedPart, data) -> Error:
 	return _zed_deserialise(inst, data)
 
 
-func part_registered(inst: ZedPart, part_id: int, host: ZedHost) -> void:
-	_zed_part_registered(inst, part_id, host)
+func part_registered(inst: ZedPart, part_id: int) -> void:
+	_zed_part_registered(inst, part_id)
 
 
 func create_shell(inst: ZedPart, shell_type: Zed.ShellType) -> Array[Node]:
@@ -84,7 +84,7 @@ func _zed_deserialise(inst: ZedPart, data) -> Error:
 
 
 @warning_ignore("unused_parameter")
-func _zed_part_registered(inst: ZedPart, part_id: int, host: ZedHost) -> void:
+func _zed_part_registered(inst: ZedPart, part_id: int) -> void:
 	return
 
 
