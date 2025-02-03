@@ -8,9 +8,8 @@ extends Area3D
 var part_id: int
 ## The sub-ID of this placement in the part
 var sub_id: int = -1
-
-var armature_index: int = 0
-
+## *shrugsss*
+var sub_id_is_armature_index: bool = false
 
 var _volume_id: int
 var _bench: Bench
@@ -27,4 +26,5 @@ func _enter_tree() -> void:
 
 
 func _process(_delta: float) -> void:
-	transform = _bench.get_zed_host().part_armature_get_transform(part_id, armature_index)
+	if sub_id_is_armature_index:
+		transform = _bench.get_zed_host().part_armature_get_transform(part_id, sub_id)

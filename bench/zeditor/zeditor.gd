@@ -147,6 +147,7 @@ signal operation_ended(op: ZedOperation)
 @export var item_tray: ItemPicker
 
 var unre: UndoRedo = UndoRedo.new()
+var selection: ZeditorSelection = ZeditorSelection.new()
 
 var _bench: Bench
 var _workspace: Workspace
@@ -169,6 +170,8 @@ func setup_context(bench: Bench) -> void:
 	_bench = bench
 	_workspace = _bench.get_workspace()
 	_inspector_man.setup(_bench, self)
+
+	selection.changed.connect(_on_selection_changed)
 
 	# NOTE: Cheating here for testing -- toolbag is to be initialised externally and passed to Zeditor.
 	for zc in _bench.get_zed_class_table().get_classes():
@@ -354,11 +357,12 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 ## Returns [code]true[/code] if effective, or [code]false[/code] if nothing happened.
 func pointer_activate() -> bool:
 	if _workspace.is_part_picked():
-		replace_active_array(PackedInt64Array([_workspace.get_picked_part()]))
+		var placement_id := _workspace.get_picked_placement()
+		selection.select_part_armature_points(_workspace.placement_get_part_id(placement_id), [_workspace.placement_get_sub_id(placement_id)])
 		return true
 	elif _workspace.get_picked_node() == null:
 		# only deselect if there is nothing picked
-		replace_active_array(PackedInt64Array())
+		selection.clear()
 		return true
 	return false
 
@@ -448,8 +452,8 @@ func _process_builder_requests() -> void:
 
 
 func _accept_activate_request(req: ActivateRequest) -> void:
-		module_activate(req.module, req.channel)
-		req._finalise(ActivateRequest.Outcome.ACCEPTED)
+	module_activate(req.module, req.channel)
+	req._finalise(ActivateRequest.Outcome.ACCEPTED)
 
 
 func _populate_item_picker() -> void:
@@ -488,3 +492,10 @@ func _on_item_tray_item_selected(item_id: int) -> void:
 	var data := item_tray.item_get_userdata(item_id) as Toolbag.BaseItem
 	if data is Toolbag.Buildable:
 		build(data as Toolbag.Buildable)
+
+
+func _on_selection_changed() -> void:
+	clear_active()
+	if selection.has_active_part():
+		add_active(selection.get_active_part())
+	print("sel: part=%s type=%s items=%s" % [ selection.get_active_part(), selection.get_active_type(), selection.get_active_items() ])

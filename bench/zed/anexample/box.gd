@@ -33,7 +33,8 @@ func _create_edit() -> Node3D:
 	collider.shape = shape
 	var node := Placement3D.new()
 	node.part_id = _part_id
-	node.armature_index = 0
+	node.sub_id = 0
+	node.sub_id_is_armature_index = true
 	node.add_child(collider)
 	node.add_child(_create_visual())
 	return node
