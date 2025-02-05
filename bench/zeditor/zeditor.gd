@@ -362,7 +362,10 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 func pointer_activate() -> bool:
 	if _workspace.is_part_picked():
 		var placement_id := _workspace.get_picked_placement()
-		selection.select_part_armature_points(_workspace.placement_get_part_id(placement_id), [_workspace.placement_get_sub_id(placement_id)])
+		var part_id := _workspace.placement_get_part_id(placement_id)
+		var indices := PackedInt64Array([_workspace.placement_get_sub_id(placement_id)])
+		var sel := ZeditorSelection.Selectable.create_indexed(Zed.ItemType.ARMATURE_POINT, part_id, indices)
+		selection.add_selectable(sel)
 		return true
 	elif _workspace.get_picked_node() == null:
 		# only deselect if there is nothing picked
@@ -515,6 +518,9 @@ func _on_item_tray_item_selected(item_id: int) -> void:
 
 func _on_selection_changed() -> void:
 	clear_active()
-	if selection.has_active_part():
-		add_active(selection.get_active_part())
-	print("sel: part=%s type=%s items=%s" % [ selection.get_active_part(), selection.get_active_type(), selection.get_active_items() ])
+	var selected_armature := selection.get_selectables_with_item_type(Zed.ItemType.ARMATURE_POINT)
+	for sel in selected_armature:
+		if sel.is_empty():
+			continue
+		var part_id: int = sel.indexed_get_item()
+		add_active(part_id)

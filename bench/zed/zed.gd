@@ -7,3 +7,9 @@ enum ShellType {
 	EDIT,
 	SIM,
 }
+
+
+enum ItemType {
+	PART,
+	ARMATURE_POINT,
+}
