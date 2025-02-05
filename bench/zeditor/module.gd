@@ -53,15 +53,20 @@ func _module_editable_released(editable_id: int) -> void:
 
 @warning_ignore("unused_parameter")
 func _module_on_zeditor_editable_activated(editable_id: int) -> void:
-	if _module_handles_editable(editable_id):
-		var channel := _zeditor.channel_alloc() if channel_override == -1 else channel_override
-		var req := _zeditor.request_activate_builder(_id, channel, editable_id, activation_priority)
-		req.processed.connect(func(accepted: bool):
-			if accepted:
-				_zeditor.module_grab(_id, editable_id)
-				_holding[editable_id] = 1
-				_module_editable_grabbed(editable_id)
-		)
+	if !_zeditor.editable_is_locked(editable_id) && _module_handles_editable(editable_id):
+		if _zeditor.module_is_active(_id):
+			_zeditor.module_grab(_id, editable_id)
+			_holding[editable_id] = 1
+			_module_editable_grabbed(editable_id)
+		else:
+			var channel := _zeditor.channel_alloc() if channel_override == -1 else channel_override
+			var req := _zeditor.request_activate_builder(_id, channel, editable_id, activation_priority)
+			req.processed.connect(func(accepted: bool):
+				if accepted:
+					_zeditor.module_grab(_id, editable_id)
+					_holding[editable_id] = 1
+					_module_editable_grabbed(editable_id)
+			)
 
 
 @warning_ignore("unused_parameter")
