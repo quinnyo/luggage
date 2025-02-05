@@ -123,6 +123,7 @@ class ActivateRequest:
 
 const ACTION_POINTER_ACTIVATE := &"pointer_activate"
 const ACTION_BUILD_MENU := &"build_menu"
+const ACTION_TOOL_CANCEL := &"tool_cancel"
 
 const METHOD_MESSAGE := &"_zeditor_message"
 
@@ -153,6 +154,7 @@ var _bench: Bench
 var _workspace: Workspace
 var _inspector_man: ZedInspectorManager = ZedInspectorManager.new()
 
+var _tool_context: ZeditorTool.Context = ZeditorTool.Context.new()
 var _active: Dictionary[int, EditableInfo]
 var _builder_requests: Array[ActivateRequest] = []
 var _did_setup: bool = false
@@ -190,6 +192,8 @@ func launch() -> void:
 
 
 func halt() -> void:
+	if _tool_context.has_active_tool():
+		_tool_context.tool_deactivate()
 	clear_active()
 	if item_tray && item_tray.item_selected.is_connected(_on_item_tray_item_selected):
 		item_tray.item_selected.disconnect(_on_item_tray_item_selected)
@@ -428,6 +432,15 @@ func close_part_inspector(editable_id: int) -> void:
 		_inspector_man.close_part_inspector(editable_id)
 
 
+func activate_tool(tool: ZeditorTool) -> void:
+	if _tool_context.has_active_tool():
+		_tool_context.tool_deactivate()
+	_tool_context.bench = _bench
+	_tool_context.selection = selection.get_state_copy()
+	if !_tool_context.try_activate(tool):
+		print("tool not activated")
+
+
 func _process_builder_requests() -> void:
 	var by_editable: Dictionary[int, Array]
 	for req in _builder_requests:
@@ -469,7 +482,13 @@ func _init() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
+	if _tool_context.has_active_tool():
+		if event.is_action_pressed(ACTION_TOOL_CANCEL, false, true):
+			_tool_context.tool_deactivate()
+			get_viewport().set_input_as_handled()
+		elif _tool_context.tool_input(event):
+			get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
 		if pointer_activate():
 			get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):

@@ -100,6 +100,11 @@ func _delete_one() -> void:
 		zeditor.execute_operation(op)
 
 
+func _test_activate_tool() -> void:
+	var tool := preload("res://bench/zeditor/tools/example.gd").new()
+	zeditor.activate_tool(tool)
+
+
 func _on_part_placement_conflict_added(_part_id: int, conflict_id: int, data: Dictionary[StringName, Variant]) -> void:
 	var volume: Area3D = data[&"volume"]
 	var marker: Node3D = preload("res://doodads/utility/problem_marker_3d.tscn").instantiate()
@@ -150,6 +155,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.is_action_pressed(&"ui_down"):
 			print("clearing unre history... (%d)" % [ zeditor.unre.get_history_count() ])
 			zeditor.unre.clear_history()
+		elif event is InputEventKey:
+			var kev := event as InputEventKey
+			if kev.pressed && kev.ctrl_pressed && kev.keycode == KEY_1:
+				_test_activate_tool()
 	elif bench.get_active_phase_name() == PHASE_NAME_RUN:
 		if event.is_action_pressed(&"ui_cancel"):
 			bench.change_phase_named(PHASE_NAME_EDIT)
