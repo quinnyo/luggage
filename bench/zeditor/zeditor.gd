@@ -484,6 +484,11 @@ func _init() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
+func _process(_delta: float) -> void:
+	if _tool_context.has_active_tool():
+		_tool_context.tool_process()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if _tool_context.has_active_tool():
 		if event.is_action_pressed(ACTION_TOOL_CANCEL, false, true):
