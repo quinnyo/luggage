@@ -50,9 +50,13 @@ class Context:
 
 	func begin_action(action: Action) -> void:
 		_action = action
+		_action.begin()
 
 	func has_running_action() -> bool:
 		return has_active_tool() && _action && _action.is_running()
+
+	func get_action() -> Action:
+		return _action
 
 	func _reset_activation_state() -> void:
 		if _tool:
