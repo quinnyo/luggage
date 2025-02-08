@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=30 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://bk5a3tflnvat0" path="res://bench/zeditor/toolbag.gd" id="12_j2aeq"]
 [ext_resource type="Script" uid="uid://bkixpxic4008u" path="res://bench/zed/anexample/box_zeditor_module.gd" id="12_jcig6"]
 [ext_resource type="PackedScene" uid="uid://d3uwlt4547leb" path="res://bench/extra/bench_status_overlay.tscn" id="15_tdyvq"]
+[ext_resource type="Script" uid="uid://ncc077aca8gg" path="res://bench/extra/zeditor_tool_label.gd" id="18_nxqlp"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
 
@@ -193,3 +194,15 @@ layout_mode = 2
 text = "words of label"
 label_settings = SubResource("LabelSettings_r657h")
 script = ExtResource("10_f0urt")
+
+[node name="ZeditorToolLabel" type="Label" parent="Bench/DebugOverlay"]
+visible = false
+layout_mode = 2
+script = ExtResource("18_nxqlp")
+
+[connection signal="halting" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="hide"]
+[connection signal="launching" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="show"]
+[connection signal="tool_activated" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_activated"]
+[connection signal="tool_deactivating" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_deactivating"]
+[connection signal="tool_operation_ending" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_ending"]
+[connection signal="tool_operation_started" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_started"]
