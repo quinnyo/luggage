@@ -19,6 +19,7 @@ var _zed_host: _ZedHost
 var _active_phase: BenchPhase
 var _dest_phase: BenchPhase
 var _phases: Dictionary[StringName, BenchPhase]
+var _unre: UndoRedo = UndoRedo.new()
 
 
 static func find_bench_parent(node: Node) -> Bench:
@@ -94,6 +95,10 @@ func get_phase_string(phase: BenchPhase) -> String:
 	else:
 		parts.push_back("NULL")
 	return "%s" % [ ":".join(parts) ]
+
+
+func get_undo_redo() -> UndoRedo:
+	return _unre
 
 
 func _start_phase_change(to: BenchPhase) -> void:

@@ -147,7 +147,13 @@ signal operation_ended(op: ZedOperation)
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
 
-var unre: UndoRedo = UndoRedo.new()
+## Zeditor no longer has its own undo history -- this is now provided by Bench.
+## This property will be removed but for now it references the [method Bench.get_undo_redo()].
+var unre: UndoRedo:
+	set(_value):
+		push_error("no set")
+	get:
+		return _bench.get_undo_redo()
 var selection: ZeditorSelection = ZeditorSelection.new()
 
 var _bench: Bench
