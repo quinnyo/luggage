@@ -368,9 +368,11 @@ func pointer_activate() -> bool:
 		selection.add_selectable(sel)
 		return true
 	elif _workspace.get_picked_node() == null:
-		# only deselect if there is nothing picked
-		selection.clear()
-		return true
+		# only deselect if there is nothing picked & there is something selected!
+		# TODO: active operation/tool should block Zeditor input
+		if !selection.is_empty():
+			selection.clear()
+			return true
 	return false
 
 
