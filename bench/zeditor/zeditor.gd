@@ -123,7 +123,6 @@ class ActivateRequest:
 
 const ACTION_POINTER_ACTIVATE := &"pointer_activate"
 const ACTION_BUILD_MENU := &"build_menu"
-const ACTION_TOOL_CANCEL := &"tool_cancel"
 
 const METHOD_MESSAGE := &"_zeditor_message"
 
@@ -139,10 +138,10 @@ signal halting()
 signal editable_activated(editable_id: int)
 signal editable_deactivated(editable_id: int)
 signal inspector_opening(inspector: ZedInspector)
-signal operation_started(op: ZedOperation)
-signal operation_committing(op: ZedOperation)
-signal operation_ended(op: ZedOperation)
-
+signal tool_activated(tool: ZeditorTool)
+signal tool_deactivating(tool: ZeditorTool)
+signal tool_operation_started(op: ZedOperation)
+signal tool_operation_ending(op: ZedOperation, cancelled: bool)
 
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
@@ -415,10 +414,9 @@ func redo() -> void:
 ## commit an operation immediately.
 func execute_operation(op: ZedOperation) -> void:
 	assert(op.is_ok())
-	operation_started.emit(op)
-	operation_committing.emit(op)
+	#operation_started.emit(op)
+	#operation_ending.emit(op, false)
 	op.commit(unre)
-	operation_ended.emit(op)
 
 
 func open_part_inspector(editable_id: int) -> ZedInspector:
@@ -490,6 +488,10 @@ func _populate_item_picker() -> void:
 
 func _init() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
+	_tool_context.tool_activated.connect(tool_activated.emit)
+	_tool_context.tool_deactivating.connect(tool_deactivating.emit)
+	_tool_context.operation_started.connect(tool_operation_started.emit)
+	_tool_context.operation_ending.connect(tool_operation_ending.emit)
 
 
 func _process(_delta: float) -> void:
@@ -499,23 +501,22 @@ func _process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _tool_context.has_active_tool():
-		if event.is_action_pressed(ACTION_TOOL_CANCEL, false, true):
-			_tool_context.tool_deactivate()
+		if _tool_context.tool_input(event):
 			get_viewport().set_input_as_handled()
-		elif _tool_context.tool_input(event):
+			return
+	if !_tool_context.has_live_operation():
+		if event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
+			if pointer_activate():
+				get_viewport().set_input_as_handled()
+		elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
+			open_toolbag()
 			get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(ACTION_POINTER_ACTIVATE, false, true):
-		if pointer_activate():
+		elif event.is_action_pressed(&"ui_undo", false, true):
+			undo()
 			get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(ACTION_BUILD_MENU, false, true):
-		open_toolbag()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(&"ui_undo", false, true):
-		undo()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed(&"ui_redo", false, true):
-		redo()
-		get_viewport().set_input_as_handled()
+		elif event.is_action_pressed(&"ui_redo", false, true):
+			redo()
+			get_viewport().set_input_as_handled()
 
 
 func _on_zed_host_part_removed(part_id: int) -> void:
