@@ -25,8 +25,8 @@ func _bind(bench: Bench) -> BindStatus:
 	return BindStatus.OK
 
 
-func _get_name() -> String:
-	return "op.drag"
+func _get_name() -> StringName:
+	return &"op.drag"
 
 
 func _do() -> void:

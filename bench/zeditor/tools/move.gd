@@ -1,8 +1,8 @@
 extends ZeditorTool
 
 
-func _tool_get_name() -> String:
-	return "tool.move"
+func _tool_get_name() -> StringName:
+	return &"tool.move"
 
 
 func _tool_can_activate(context: Context) -> bool:

@@ -18,8 +18,8 @@ func _bind(bench: Bench) -> BindStatus:
 	return BindStatus.OK
 
 
-func _get_name() -> String:
-	return "Build %s" % [ _bind_zclass ]
+func _get_name() -> StringName:
+	return &"op.build"
 
 
 func _do() -> void:

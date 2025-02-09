@@ -25,7 +25,7 @@ var _bind_status: BindStatus = BindStatus.UNBOUND
 var _status: Status = Status.NONE
 
 
-func get_name() -> String:
+func get_name() -> StringName:
 	return _get_name()
 
 
@@ -92,9 +92,9 @@ func _bind(bench: Bench) -> BindStatus:
 
 
 ## Return the name of the operation as it will appear in undo history.
-func _get_name() -> String:
+func _get_name() -> StringName:
 	push_error("not implemented")
-	return ""
+	return &""
 
 
 ## Implement the 'do' (forwards) part of the operation.

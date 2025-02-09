@@ -1,5 +1,7 @@
 class_name ZeditorTool
 extends RefCounted
+## ZeditorTool is a base class for implementing tools for Zeditor.
+## A tool is a thing that does something to the Zed scene state, usually in response to user input.
 
 
 ## Tool activation context
@@ -87,11 +89,11 @@ class Context:
 		_operation = null
 
 
-func get_name() -> String:
+func get_name() -> StringName:
 	return _tool_get_name()
 
 
-func _tool_get_name() -> String:
+func _tool_get_name() -> StringName:
 	return str(self)
 
 
