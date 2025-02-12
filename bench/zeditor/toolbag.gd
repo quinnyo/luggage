@@ -10,14 +10,14 @@ class BaseItem:
 
 
 class Tool extends BaseItem:
-	pass
+	var tool: ZeditorTool
 
 
 class Buildable extends BaseItem:
 	var zed_class: ZedClass
 
 
-var _buildables: Array[Buildable]
+var _items: Array[BaseItem]
 
 
 func add_buildable(zed_class: ZedClass) -> void:
@@ -25,12 +25,12 @@ func add_buildable(zed_class: ZedClass) -> void:
 	tool.zed_class = zed_class
 	tool.label = zed_class.get_buildable_name()
 	tool.icon = zed_class.get_buildable_icon()
-	_buildables.push_back(tool)
+	_items.push_back(tool)
 
 
-func get_buildables(begin: int = 0, end: int = 0x7FFF_FFFF) -> Array[Buildable]:
-	return _buildables.slice(begin, end)
+func get_items(begin: int = 0, end: int = 0x7FFF_FFFF) -> Array[BaseItem]:
+	return _items.slice(begin, end)
 
 
-func get_buildables_count() -> int:
-	return _buildables.size()
+func get_buildables() -> Array[BaseItem]:
+	return _items.filter(func(it: BaseItem) -> bool: return it is Buildable)

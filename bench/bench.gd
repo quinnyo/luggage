@@ -12,6 +12,7 @@ signal phase_change_completed(to: BenchPhase)
 @export var workspace: Workspace
 @export var phases: Array[BenchPhase]
 
+var notices := Notices.new()
 
 var _zed_class_table: _ZedClassTable
 var _zed_host: _ZedHost
@@ -46,6 +47,12 @@ func get_zed_host() -> _ZedHost:
 
 func get_workspace() -> Workspace:
 	return workspace
+
+
+func get_zed_class(ident: StringName) -> ZedClass:
+	if get_zed_class_table().has_type(ident):
+		return get_zed_class_table().get_type(ident)
+	return null
 
 
 func add_phase(phase_name: StringName, phase: BenchPhase) -> void:

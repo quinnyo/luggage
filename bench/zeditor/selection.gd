@@ -78,6 +78,12 @@ class Selectable:
 		o._data = _data.duplicate(true)
 		return o
 
+	static func create(item_type: Variant, items: Array[Variant]) -> Selectable:
+		var o := Selectable.new()
+		o._data[SEL_ITEM_TYPE] = item_type
+		o._data[SEL_ITEMS] = items
+		return o
+
 	static func create_indexed(item_type: Variant, indexed_item: Variant, indices: PackedInt64Array) -> Selectable:
 		var o := Selectable.new()
 		o._data[SEL_ITEM_TYPE] = item_type

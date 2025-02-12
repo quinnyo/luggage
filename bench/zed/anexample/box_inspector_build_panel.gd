@@ -14,5 +14,5 @@ func _zed_inspector_entered(inspector: ZedInspector) -> void:
 func _on_randomise_pressed() -> void:
 	var op := _ZedOperationBoxRandomise.new()
 	op.target = _inspector.target
-	op.bind(_inspector.bench)
-	_inspector.zeditor.execute_operation(op)
+	var zedit := ZeditMan.get_instance(_inspector.bench)
+	zedit.operation_begin(op)

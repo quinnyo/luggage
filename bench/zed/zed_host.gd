@@ -64,7 +64,7 @@ func alloc_part_id() -> int:
 	return id
 
 
-## Insert a part with the specified ID. The node will be parented to the host.
+## Insert a part with the specified ID.
 func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	assert(!_parts.has(id))
 	assert(id != 0)
@@ -80,7 +80,7 @@ func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	part_added.emit(id)
 
 
-## Add a part instance to the scene. The node will be parented to the host.
+## Add a part instance to the scene.
 ## The return value is a unique ID that can be used to refer to the part.
 func add_part(instance: ZedPart, zed_class: _ZedClass) -> int:
 	var id := alloc_part_id()
@@ -120,6 +120,10 @@ func part_armature_get_transform(part_id: int, index: int) -> Transform3D:
 
 func part_armature_set_transform(part_id: int, index: int, value: Transform3D) -> void:
 	_get_part(part_id).armature.set_transform(index, value)
+
+
+func part_armature_get_size(part_id: int) -> int:
+	return _get_part(part_id).armature.size()
 
 
 func _get_part(part_id: int) -> PartBox:

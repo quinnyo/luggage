@@ -143,6 +143,7 @@ signal tool_deactivating(tool: ZeditorTool)
 signal tool_operation_started(op: ZedOperation)
 signal tool_operation_ending(op: ZedOperation, cancelled: bool)
 
+@export var commands: CommandSet
 @export var toolbag: Toolbag
 @export var item_tray: ItemPicker
 
@@ -381,34 +382,9 @@ func pointer_activate() -> bool:
 	return false
 
 
-## Create a new instance of the buildable part
-func build(buildable: Toolbag.Buildable) -> void:
-	var op := ZedOperationBuild.new()
-	op.buildable = buildable
-	op.bind(_bench)
-	if op.is_ok():
-		execute_operation(op)
-
-
 func open_toolbag() -> void:
 	assert(item_tray)
 	item_tray.open()
-
-
-func undo() -> void:
-	if unre.has_undo():
-		print("undo '%s'" % [ unre.get_current_action_name() ])
-		unre.undo()
-	else:
-		print("nothing to undo")
-
-
-func redo() -> void:
-	if unre.has_redo():
-		print("redo '%s'" % [ unre.get_action_name(unre.get_current_action() + 1) ])
-		unre.redo()
-	else:
-		print("nothing to redo")
 
 
 ## commit an operation immediately.
@@ -422,14 +398,11 @@ func execute_operation(op: ZedOperation) -> void:
 func open_part_inspector(editable_id: int) -> ZedInspector:
 	var inspector := _inspector_man.open_part_inspector(editable_id)
 
+	var sel := ZeditorSelection.State.new()
+	sel.add(ZeditorSelection.Selectable.create(Zed.ItemType.PART, [ editable_id ]))
 	var erase_button := Button.new()
 	erase_button.text = "Erase"
-	erase_button.pressed.connect(func():
-		var op := ZedOperationErase.new()
-		op.targets = [ editable_id ]
-		op.bind(_bench)
-		execute_operation(op)
-	)
+	erase_button.pressed.connect(command.bind(&"erase", sel))
 	inspector.add_control(ZedInspector.LayoutArea.TOOLBAR_RIGHT, erase_button)
 
 	inspector_opening.emit(inspector)
@@ -448,6 +421,18 @@ func activate_tool(tool: ZeditorTool) -> void:
 	_tool_context.selection = selection.get_state_copy()
 	if !_tool_context.try_activate(tool):
 		print("tool not activated")
+
+
+func command(ident: StringName, custom_selection: ZeditorSelection.State = null, data: Dictionary[StringName, Variant] = {}) -> void:
+	assert(has_command(ident))
+	var cmd_impl := commands.get_command_impl(ident)
+	var invoc := cmd_impl.bind(_bench, custom_selection if custom_selection else selection.get_state_copy(), data)
+	if invoc.can_invoke():
+		invoc.invoke()
+
+
+func has_command(ident: StringName) -> bool:
+	return commands.has_command_impl(ident)
 
 
 func _process_builder_requests() -> void:
@@ -500,6 +485,8 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	#var zedit := ZeditMan.get_instance(_bench)
+	#if !zedit.has_live_operation():
 	if _tool_context.has_active_tool():
 		if _tool_context.tool_input(event):
 			get_viewport().set_input_as_handled()
@@ -512,10 +499,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			open_toolbag()
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"ui_undo", false, true):
-			undo()
+			command(&"undo")
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"ui_redo", false, true):
-			redo()
+			command(&"redo")
 			get_viewport().set_input_as_handled()
 
 
@@ -527,7 +514,8 @@ func _on_zed_host_part_removed(part_id: int) -> void:
 func _on_item_tray_item_selected(item_id: int) -> void:
 	var data := item_tray.item_get_userdata(item_id) as Toolbag.BaseItem
 	if data is Toolbag.Buildable:
-		build(data as Toolbag.Buildable)
+		_bench.notices.add(&"build.wish", data.zed_class)
+		command(&"build")
 
 
 func _on_selection_changed() -> void:

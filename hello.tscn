@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=44 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://lp4df172x6r1" path="res://bench/zeditor/launch_zeditor.gd" id="6_l6pdb"]
 [ext_resource type="Script" uid="uid://ojgm0ce8lkjc" path="res://bench/workspace/workspace.gd" id="6_qn3nj"]
 [ext_resource type="Script" uid="uid://clhw87n78cqlx" path="res://bench/phase.gd" id="6_tda05"]
+[ext_resource type="Script" uid="uid://db8j305je0083" path="res://bench/zedit_man.gd" id="7_au6eq"]
 [ext_resource type="Script" uid="uid://sriyl27qvscu" path="res://bench/zeditor/zeditor.gd" id="9_f0urt"]
 [ext_resource type="PackedScene" uid="uid://cshgxpfkg137k" path="res://doodads/utility/pindicator.tscn" id="9_jfkdj"]
 [ext_resource type="Script" uid="uid://bq5q60xyais72" path="res://bench/workspace/support_3d.gd" id="9_ruqtr"]
@@ -17,7 +18,14 @@
 [ext_resource type="Script" uid="uid://cdpuwy53xo6gv" path="res://bench/zeditor/modules/highlighter.gd" id="12_aj2tw"]
 [ext_resource type="Script" uid="uid://bk5a3tflnvat0" path="res://bench/zeditor/toolbag.gd" id="12_j2aeq"]
 [ext_resource type="Script" uid="uid://bkixpxic4008u" path="res://bench/zed/anexample/box_zeditor_module.gd" id="12_jcig6"]
+[ext_resource type="Script" uid="uid://dgdwb85sv3xv4" path="res://bench/zeditor/command_box.gd" id="14_8i1kx"]
+[ext_resource type="Script" uid="uid://de5rbw2u1q6wg" path="res://bench/zeditor/commands/build.gd" id="14_au6eq"]
+[ext_resource type="Script" uid="uid://tvosle7u3wlh" path="res://bench/zeditor/command_set.gd" id="14_utoey"]
 [ext_resource type="PackedScene" uid="uid://d3uwlt4547leb" path="res://bench/extra/bench_status_overlay.tscn" id="15_tdyvq"]
+[ext_resource type="Script" uid="uid://b3t4rrtkvbx7l" path="res://bench/zeditor/commands/move.gd" id="15_utoey"]
+[ext_resource type="Script" uid="uid://n24bi6fkgwwc" path="res://bench/zeditor/commands/undo.gd" id="16_vxe8i"]
+[ext_resource type="Script" uid="uid://dutnppmb3dn6l" path="res://bench/zeditor/commands/redo.gd" id="17_gupn2"]
+[ext_resource type="Script" uid="uid://dwv22edtrfnru" path="res://bench/zeditor/commands/erase.gd" id="18_gupn2"]
 [ext_resource type="Script" uid="uid://ncc077aca8gg" path="res://bench/extra/zeditor_tool_label.gd" id="18_nxqlp"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
@@ -48,6 +56,47 @@ radius = 0.1
 height = 0.2
 radial_segments = 12
 rings = 6
+
+[sub_resource type="Resource" id="Resource_wh16q"]
+script = ExtResource("14_8i1kx")
+impl = ExtResource("14_au6eq")
+name = "Build"
+metadata/_custom_type_script = ExtResource("14_8i1kx")
+
+[sub_resource type="Resource" id="Resource_k4h3f"]
+script = ExtResource("14_8i1kx")
+impl = ExtResource("18_gupn2")
+name = "Erase"
+metadata/_custom_type_script = ExtResource("14_8i1kx")
+
+[sub_resource type="Resource" id="Resource_gupn2"]
+script = ExtResource("14_8i1kx")
+impl = ExtResource("15_utoey")
+name = "Move"
+metadata/_custom_type_script = ExtResource("14_8i1kx")
+
+[sub_resource type="Resource" id="Resource_ouvrk"]
+script = ExtResource("14_8i1kx")
+impl = ExtResource("17_gupn2")
+name = "Redo"
+metadata/_custom_type_script = ExtResource("14_8i1kx")
+
+[sub_resource type="Resource" id="Resource_jof2w"]
+script = ExtResource("14_8i1kx")
+impl = ExtResource("16_vxe8i")
+name = "Undo"
+metadata/_custom_type_script = ExtResource("14_8i1kx")
+
+[sub_resource type="Resource" id="Resource_vxe8i"]
+script = ExtResource("14_utoey")
+_data = Dictionary[StringName, ExtResource("14_8i1kx")]({
+&"build": SubResource("Resource_wh16q"),
+&"erase": SubResource("Resource_k4h3f"),
+&"move": SubResource("Resource_gupn2"),
+&"redo": SubResource("Resource_ouvrk"),
+&"undo": SubResource("Resource_jof2w")
+})
+metadata/_custom_type_script = ExtResource("14_utoey")
 
 [sub_resource type="SystemFont" id="SystemFont_r657h"]
 font_names = PackedStringArray("Iosevka", "Liberation Mono", "DejaVu Sans Mono", "Lucida Console", "Cascadia Code", "Consolas", "Monospace")
@@ -94,6 +143,10 @@ metadata/_custom_type_script = ExtResource("6_tda05")
 [node name="PhaseZedControl" type="Node" parent="Bench/Phases/Run"]
 script = ExtResource("5_tda05")
 shell_type = 2
+
+[node name="ZditMan" type="Node" parent="Bench"]
+script = ExtResource("7_au6eq")
+metadata/_custom_type_script = ExtResource("7_au6eq")
 
 [node name="Workspace" type="Node3D" parent="Bench"]
 script = ExtResource("6_qn3nj")
@@ -162,6 +215,7 @@ skeleton = NodePath("../..")
 
 [node name="Zeditor" type="Node" parent="Bench" node_paths=PackedStringArray("toolbag", "item_tray")]
 script = ExtResource("9_f0urt")
+commands = SubResource("Resource_vxe8i")
 toolbag = NodePath("Toolbag")
 item_tray = NodePath("ItemTray")
 

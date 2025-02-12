@@ -1,15 +1,11 @@
-extends ZeditorTool
+extends CommandImpl
 
 
-func _tool_get_name() -> StringName:
-	return &"tool.move"
+func _cmd_can_invoke(context: Invocation) -> bool:
+	return context.selection.has_item_type(Zed.ItemType.ARMATURE_POINT)
 
 
-func _tool_can_activate(context: Context) -> bool:
-	return context.selection.is_empty() || context.selection.has_item_type(Zed.ItemType.ARMATURE_POINT)
-
-
-func _tool_activate(context: Context) -> void:
+func _cmd_invoke(context: Invocation) -> int:
 	var op_drag := preload("res://bench/operations/drag.gd").new()
 	var selected_armature := context.selection.get_selectables_with_item_type(Zed.ItemType.ARMATURE_POINT)
 	if selected_armature.size():
@@ -25,5 +21,6 @@ func _tool_activate(context: Context) -> void:
 					xf.origin = value
 					zhost.part_armature_set_transform(part_id, index, xf)
 				)
-
-		context.operation_begin(op_drag)
+		var zedit := ZeditMan.get_instance(context.bench)
+		zedit.operation_begin(op_drag)
+	return 0
