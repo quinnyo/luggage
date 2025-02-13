@@ -14,6 +14,16 @@ const SEL_INDEXED_INDICES := &"indices"
 class Selectable:
 	var _data: Dictionary
 
+	func has_item(item: Variant) -> bool:
+		return indexed_get_item() == item if is_indexed() else get_items().has(item)
+
+	func remove_item(item: Variant) -> void:
+		assert(has_item(item))
+		if is_indexed():
+			_data.clear()
+		else:
+			_data[SEL_ITEMS].erase(item)
+
 	func get_item_type() -> Variant:
 		return _data[SEL_ITEM_TYPE] if _data.has(SEL_ITEM_TYPE) else null
 
@@ -104,6 +114,16 @@ class State:
 				return
 		_selectables.push_back(sel)
 
+	func remove_item(item_type: Variant, item: Variant) -> bool:
+		var result := false
+		for sel in _selectables:
+			if sel.get_item_type() == item_type && sel.has_item(item):
+				sel.remove_item(item)
+				result = true
+		if result:
+			_selectables = _selectables.filter(func(sel): return !sel.is_empty())
+		return result
+
 	func has_item_type(item_type: Variant) -> bool:
 		assert(_invalidated == false)
 		for sel in _selectables:
@@ -151,6 +171,13 @@ var _state: State = State.new()
 func add_selectable(selectable: Selectable) -> void:
 	_state.add(selectable)
 	changed.emit()
+
+
+func remove_item(item_type: Variant, item: Variant) -> bool:
+	var result := _state.remove_item(item_type, item)
+	if result:
+		changed.emit()
+	return result
 
 
 func has_item_type(item_type: Variant) -> bool:

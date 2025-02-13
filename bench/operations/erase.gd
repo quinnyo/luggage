@@ -28,6 +28,9 @@ func _get_name() -> StringName:
 func _do() -> void:
 	for id in _bind_targets:
 		zhost.remove_part(id)
+		# yes, the selection thing is this stupid
+		get_selection().remove_item(Zed.ItemType.PART, id)
+		get_selection().remove_item(Zed.ItemType.ARMATURE_POINT, id)
 
 
 func _undo() -> void:
