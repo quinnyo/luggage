@@ -24,6 +24,10 @@ func _get_name() -> StringName:
 
 func _do() -> void:
 	zhost.insert_part(_bind_part_id, _bind_instance, _bind_zclass)
+	get_selection().clear()
+	if zhost.part_armature_get_size(_bind_part_id) > 0:
+		var sel := ZeditorSelection.Selectable.create_indexed(Zed.ItemType.ARMATURE_POINT, _bind_part_id, [ 0 ])
+		get_selection().add_selectable(sel)
 
 
 func _undo() -> void:

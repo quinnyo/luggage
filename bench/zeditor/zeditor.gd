@@ -154,7 +154,11 @@ var unre: UndoRedo:
 		push_error("no set")
 	get:
 		return _bench.get_undo_redo()
-var selection: ZeditorSelection = ZeditorSelection.new()
+var selection: ZeditorSelection:
+	set(_value):
+		push_error("no set")
+	get:
+		return _bench.selection
 
 var _bench: Bench
 var _workspace: Workspace

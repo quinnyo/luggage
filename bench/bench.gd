@@ -13,6 +13,7 @@ signal phase_change_completed(to: BenchPhase)
 @export var phases: Array[BenchPhase]
 
 var notices := Notices.new()
+var selection: ZeditorSelection = ZeditorSelection.new()
 
 var _zed_class_table: _ZedClassTable
 var _zed_host: _ZedHost

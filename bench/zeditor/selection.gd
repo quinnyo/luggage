@@ -176,5 +176,10 @@ func clear() -> void:
 	changed.emit()
 
 
+func restore(state: State) -> void:
+	_state = state.clone()
+	changed.emit()
+
+
 func get_state_copy() -> State:
 	return _state.clone() if _state else State.new()

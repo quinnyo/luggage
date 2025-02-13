@@ -21,8 +21,20 @@ enum Status {
 }
 
 
+var do_restore_selection: bool = true
+
+var _bench: Bench
 var _bind_status: BindStatus = BindStatus.UNBOUND
 var _status: Status = Status.NONE
+var _bind_selection: ZeditorSelection.State
+
+
+func get_bench() -> Bench:
+	return _bench
+
+
+func get_selection() -> ZeditorSelection:
+	return _bench.selection
 
 
 func get_name() -> StringName:
@@ -30,6 +42,8 @@ func get_name() -> StringName:
 
 
 func bind(bench: Bench) -> void:
+	_bench = bench
+	_bind_selection = get_selection().get_state_copy()
 	if _bind_status == BindStatus.UNBOUND:
 		_bind_status = _bind(bench)
 		if _bind_status >= BindStatus.FAILED:
@@ -59,6 +73,8 @@ func commit(unre: UndoRedo) -> void:
 		unre.create_action(_get_name())
 		unre.add_do_method(_do)
 		unre.add_undo_method(_undo)
+		if do_restore_selection:
+			unre.add_undo_method(get_selection().restore.bind(_bind_selection))
 		unre.commit_action()
 	elif _bind_status == BindStatus.NULL_EFFECT:
 		push_warning("operation '%s' has no effect" % [ _get_name() ])
