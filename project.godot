@@ -14,10 +14,6 @@ config/name="luggage"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[display]
-
-mouse_cursor/tooltip_position_offset=Vector2(16, 24)
-
 [input]
 
 pointer_activate={
