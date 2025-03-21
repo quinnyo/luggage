@@ -3,14 +3,46 @@ extends ZedPart
 
 @export var size: Vector3 = Vector3.ONE
 @export var density: float = 1.0
-@export var position: Vector3:
-	set(value):
-		position = value.snapped(size / 2.0)
+@export var position: Vector3
 
 
 var _part_id: int
 var _mesh: BoxMesh
 var _material: StandardMaterial3D
+
+
+func armature_get_size() -> int:
+	return 1
+
+
+func armature_constrain_position(p_index: int, p_position: Vector3) -> Vector3:
+	assert(p_index == 0)
+	return p_position.snapped(size / 2.0)
+
+
+func armature_constrain_euler(p_index: int, _p_euler: Vector3) -> Vector3:
+	assert(p_index == 0)
+	return Vector3()
+
+
+func armature_set_position(p_index: int, p_position: Vector3) -> void:
+	assert(p_index == 0)
+	position = armature_constrain_position(p_index, p_position)
+
+
+func armature_set_euler(p_index: int, _p_euler: Vector3) -> void:
+	assert(p_index == 0)
+	return
+
+
+func armature_get_position(p_index: int) -> Vector3:
+	assert(p_index == 0)
+	return position
+
+
+func armature_get_euler(p_index: int) -> Vector3:
+	assert(p_index == 0)
+	return Vector3()
 
 
 func _create_visual() -> Node3D:

@@ -73,7 +73,6 @@ func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	box.id = id
 	box.instance = instance
 	box.zed_class = zed_class
-	box.armature = zed_class.create_armature(instance)
 	_parts[id] = box
 	zed_class.part_registered(instance, id)
 	_create_shell(box, _bench.get_workspace().get_active_shell_type())
@@ -103,27 +102,20 @@ func notify_part_changed(part_id: int) -> void:
 
 
 func part_has_pose(part_id: int) -> bool:
-	return _get_part(part_id).armature != null
-
-
-func part_armature_get_value(part_id: int, channel: int, index: int) -> Variant:
-	return _get_part(part_id).armature.get_value(channel, index)
-
-
-func part_armature_set_value(part_id: int, channel: int, index: int, value: Variant) -> void:
-	_get_part(part_id).armature.set_value(channel, index, value)
+	return part_armature_get_size(part_id) > 0
 
 
 func part_armature_get_transform(part_id: int, index: int) -> Transform3D:
-	return _get_part(part_id).armature.get_transform(index)
+	return Transform3D(Basis.IDENTITY, _get_part(part_id).instance.armature_get_position(index))
 
 
 func part_armature_set_transform(part_id: int, index: int, value: Transform3D) -> void:
-	_get_part(part_id).armature.set_transform(index, value)
+	_get_part(part_id).instance.armature_set_position(index, value.origin)
+	_get_part(part_id).instance.armature_set_euler(index, value.basis.get_euler())
 
 
 func part_armature_get_size(part_id: int) -> int:
-	return _get_part(part_id).armature.size()
+	return _get_part(part_id).instance.armature_get_size()
 
 
 func _get_part(part_id: int) -> PartBox:
@@ -163,4 +155,3 @@ class PartBox:
 	var instance: ZedPart
 	var zed_class: _ZedClass
 	var shell_id: int
-	var armature: ZedArmature
