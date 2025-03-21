@@ -3,13 +3,13 @@ extends Node
 
 const PHASE_NAME_DEFAULT := &"Default"
 const PHASE_NAME_EDIT := &"Edit"
-const PHASE_NAME_RUN := &"Run"
+const PHASE_NAME_RUN := &"Eval"
 
 
 @export var types: Array[Script] = []
 
 @onready var bench: Bench = $Bench
-@onready var zeditor: Zeditor = $Bench/Zeditor
+@onready var zeditor: Zeditor = $Zeditor
 
 var _data
 
