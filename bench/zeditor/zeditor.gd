@@ -212,16 +212,6 @@ func halt() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
-func get_active_placement(editable_id: int) -> Placement3D:
-	assert(has_active(editable_id))
-	var zhost := _bench.get_zed_host()
-	var shell_id := zhost.get_part_shell_id(editable_id)
-	for node in _workspace.shell_get_nodes(shell_id):
-		if node is Placement3D:
-			return node as Placement3D
-	return null
-
-
 func has_active(editable_id: int) -> bool:
 	return _active.has(editable_id)
 
@@ -251,12 +241,6 @@ func clear_active() -> void:
 	_active.clear()
 
 
-func replace_active_array(array: PackedInt64Array) -> void:
-	clear_active()
-	for id in array:
-		add_active(id)
-
-
 func editable_is_locked(editable: int) -> bool:
 	return locks.has_left(editable)
 
@@ -264,10 +248,6 @@ func editable_is_locked(editable: int) -> bool:
 func editable_unlock(editable: int) -> void:
 	assert(editable_is_locked(editable))
 	locks.erase_left(editable)
-
-
-func channel_has(channel: int, module: int) -> bool:
-	return channels.has_pair(channel, module)
 
 
 func channel_is_empty(channel: int) -> bool:
