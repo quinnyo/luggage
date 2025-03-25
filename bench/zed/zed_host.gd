@@ -69,6 +69,7 @@ func insert_part(id: int, instance: ZedPart, zed_class: _ZedClass) -> void:
 	assert(!_parts.has(id))
 	assert(id != 0)
 	_id_next = maxi(_id_next, id + 1)
+	instance.id = id
 	var box := PartBox.new()
 	box.id = id
 	box.instance = instance
