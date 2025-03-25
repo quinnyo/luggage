@@ -18,6 +18,10 @@ func add_target(initial_value: Vector3, fset: Callable) -> void:
 	_target_setter.push_back(fset)
 
 
+func has_target() -> bool:
+	return _target_setter.size()
+
+
 func _bind(bench: Bench) -> BindStatus:
 	_zhost = bench.get_zed_host()
 	_workspace = bench.get_workspace()
