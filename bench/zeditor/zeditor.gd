@@ -168,10 +168,13 @@ var _tool_context: ZeditorTool.Context = ZeditorTool.Context.new()
 var _active: Dictionary[int, EditableInfo]
 var _builder_requests: Array[ActivateRequest] = []
 var _did_setup: bool = false
+var _launched: bool = false
 
 var modules: Dictionary[int, ModuleInfo]
 var channels: LRMap = LRMap.new()
 var locks: LRMap = LRMap.new()
+
+var _module_activation_queue: Dictionary[int, ModuleInfo]
 
 
 func setup_context(bench: Bench) -> void:
@@ -199,6 +202,12 @@ func launch() -> void:
 	_bench.get_zed_host().part_removed.connect(_on_zed_host_part_removed)
 	launching.emit()
 	process_mode = Node.PROCESS_MODE_INHERIT
+	_launched = true
+	for channel in _module_activation_queue:
+		var module := _module_activation_queue[channel]
+		module.send_message(Message.MODULE_ACTIVATED)
+		module.node.process_mode = Node.PROCESS_MODE_INHERIT
+	_module_activation_queue.clear()
 
 
 func halt() -> void:
@@ -210,6 +219,7 @@ func halt() -> void:
 	_bench.get_zed_host().part_removed.disconnect(_on_zed_host_part_removed)
 	halting.emit()
 	process_mode = Node.PROCESS_MODE_DISABLED
+	_launched = false
 
 
 func has_active(editable_id: int) -> bool:
@@ -292,10 +302,13 @@ func module_activate(id: int, channel: int) -> void:
 	assert(channel >= 0)
 	assert(!module_is_active(id))
 	assert(channel_is_empty(channel))
-	channels.insert(channel, id)
 	var module := module_get(id)
-	module.send_message(Message.MODULE_ACTIVATED)
-	module.node.process_mode = Node.PROCESS_MODE_INHERIT
+	if !_launched:
+		_module_activation_queue[channel] = module
+	else:
+		channels.insert(channel, id)
+		module.send_message(Message.MODULE_ACTIVATED)
+		module.node.process_mode = Node.PROCESS_MODE_INHERIT
 
 
 ## removes the module from any channel it's active on
@@ -353,9 +366,7 @@ func pointer_activate() -> bool:
 	if _workspace.is_part_picked():
 		var placement_id := _workspace.get_picked_placement()
 		var part_id := _workspace.placement_get_part_id(placement_id)
-		var indices := PackedInt64Array([_workspace.placement_get_sub_id(placement_id)])
-		var sel := ZeditorSelection.Selectable.create_indexed(Zed.ItemType.ARMATURE_POINT, part_id, indices)
-		selection.add_selectable(sel)
+		selection.add(Zed.TYPE_ARMATURE_POINT, part_id, _workspace.placement_get_sub_id(placement_id))
 		return true
 	elif _workspace.get_picked_node() == null:
 		# only deselect if there is nothing picked & there is something selected!
@@ -382,8 +393,8 @@ func execute_operation(op: ZedOperation) -> void:
 func open_part_inspector(editable_id: int) -> ZedInspector:
 	var inspector := _inspector_man.open_part_inspector(editable_id)
 
-	var sel := ZeditorSelection.State.new()
-	sel.add(ZeditorSelection.Selectable.create(Zed.ItemType.PART, [ editable_id ]))
+	var sel := Zelection.new()
+	sel.add(Zed.TYPE_PART, 0, editable_id)
 	var erase_button := Button.new()
 	erase_button.text = "Erase"
 	erase_button.pressed.connect(command.bind(&"erase", sel))
@@ -407,7 +418,7 @@ func activate_tool(tool: ZeditorTool) -> void:
 		print("tool not activated")
 
 
-func command(ident: StringName, custom_selection: ZeditorSelection.State = null, data: Dictionary[StringName, Variant] = {}) -> void:
+func command(ident: StringName, custom_selection: Zelection = null, data: Dictionary[StringName, Variant] = {}) -> void:
 	assert(has_command(ident))
 	var cmd_impl := commands.get_command_impl(ident)
 	var invoc := cmd_impl.bind(_bench, custom_selection if custom_selection else selection.get_state_copy(), data)
@@ -504,9 +515,7 @@ func _on_item_tray_item_selected(item_id: int) -> void:
 
 func _on_selection_changed() -> void:
 	clear_active()
-	var selected_armature := selection.get_selectables_with_item_type(Zed.ItemType.ARMATURE_POINT)
-	for sel in selected_armature:
-		if sel.is_empty():
-			continue
-		var part_id: int = sel.indexed_get_item()
-		add_active(part_id)
+	selection.for_each_selection_where_type(Zed.TYPE_ARMATURE_POINT,
+		func(_t: StringName, context: Variant, _items: Array):
+			add_active(context)
+	)

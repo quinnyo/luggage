@@ -96,6 +96,10 @@ func remove_part(part_id: int) -> void:
 	part_removed.emit(part_id)
 
 
+func is_part_player_owned(part_id: int) -> bool:
+	return _get_part(part_id).is_player_owned
+
+
 func notify_part_changed(part_id: int) -> void:
 	var part := _get_part(part_id)
 	_clear_shell(part)
@@ -156,3 +160,4 @@ class PartBox:
 	var instance: ZedPart
 	var zed_class: _ZedClass
 	var shell_id: int
+	var is_player_owned: bool = true

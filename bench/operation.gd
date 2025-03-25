@@ -26,7 +26,7 @@ var do_restore_selection: bool = true
 var _bench: Bench
 var _bind_status: BindStatus = BindStatus.UNBOUND
 var _status: Status = Status.NONE
-var _bind_selection: ZeditorSelection.State
+var _bind_selection: Zelection
 
 
 func get_bench() -> Bench:

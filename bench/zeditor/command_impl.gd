@@ -5,7 +5,7 @@ extends RefCounted
 
 class Invocation:
 	var bench: Bench
-	var selection: ZeditorSelection.State
+	var selection: Zelection
 	var data: Dictionary[StringName, Variant]
 	var impl: CommandImpl
 
@@ -18,7 +18,7 @@ class Invocation:
 			push_error("invocation failed")
 
 
-func bind(bench: Bench, selection: ZeditorSelection.State, data: Dictionary[StringName, Variant] = {}) -> Invocation:
+func bind(bench: Bench, selection: Zelection, data: Dictionary[StringName, Variant] = {}) -> Invocation:
 	var context := Invocation.new()
 	context.bench = bench
 	context.selection = selection.clone()

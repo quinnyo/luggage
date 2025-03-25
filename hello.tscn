@@ -1,8 +1,9 @@
-[gd_scene load_steps=44 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=46 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
 [ext_resource type="Script" uid="uid://bsjphndhgyt5o" path="res://bench/zed/anexample/box_zed.gd" id="3_e2u21"]
+[ext_resource type="Script" uid="uid://c2hxi6j7lj13" path="res://parts/conveyor/conveyor_section_class.gd" id="3_jof2w"]
 [ext_resource type="Script" uid="uid://bi4xpn1ai8olr" path="res://viewport/camera/camera_plus_3d.gd" id="5_bss38"]
 [ext_resource type="Script" uid="uid://cc17s1yuxyvqy" path="res://bench/phase_zed_control.gd" id="5_tda05"]
 [ext_resource type="Script" uid="uid://lp4df172x6r1" path="res://bench/zeditor/launch_zeditor.gd" id="6_l6pdb"]
@@ -30,17 +31,6 @@
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_r657h"]
-size = Vector3(5, 1, 5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r657h"]
-transparency = 1
-albedo_color = Color(0.835438, 0.603548, 0.712191, 0.529412)
-
-[sub_resource type="BoxMesh" id="BoxMesh_f0urt"]
-material = SubResource("StandardMaterial3D_r657h")
-size = Vector3(5, 1, 5)
-
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_dvgck"]
 plane = Plane(0, 0, 1, 0)
 
@@ -57,15 +47,35 @@ height = 0.2
 radial_segments = 12
 rings = 6
 
-[sub_resource type="SystemFont" id="SystemFont_r657h"]
-font_names = PackedStringArray("Iosevka", "Liberation Mono", "DejaVu Sans Mono", "Lucida Console", "Cascadia Code", "Consolas", "Monospace")
+[sub_resource type="Gradient" id="Gradient_ouvrk"]
+offsets = PackedFloat32Array(0.0286738, 0.0394265, 0.910394, 0.921147)
+colors = PackedColorArray(0.387465, 0.387465, 0.387465, 1, 0.486173, 0.486173, 0.486173, 0, 0.496216, 0.496216, 0.496216, 0, 1, 1, 1, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_r657h"]
-font = SubResource("SystemFont_r657h")
-font_size = 12
-font_color = Color(0.982237, 0.86182, 0.39165, 1)
-outline_size = 1
-outline_color = Color(0, 0, 0, 1)
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_k4h3f"]
+gradient = SubResource("Gradient_ouvrk")
+fill = 2
+fill_from = Vector2(0.9, 0.9)
+fill_to = Vector2(0, 0)
+repeat = 1
+metadata/_snap_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0wrwj"]
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.91344, 0.347947, 0.410233, 0.505882)
+albedo_texture = SubResource("GradientTexture2D_k4h3f")
+metallic_specular = 0.0
+uv1_triplanar = true
+texture_filter = 5
+distance_fade_mode = 1
+distance_fade_min_distance = 35.0
+distance_fade_max_distance = 20.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_whyow"]
+material = SubResource("StandardMaterial3D_0wrwj")
+size = Vector2(50, 50)
+center_offset = Vector3(0, 0.01, 0)
+orientation = 1
 
 [sub_resource type="Resource" id="Resource_wh16q"]
 script = ExtResource("14_8i1kx")
@@ -108,9 +118,20 @@ _data = Dictionary[StringName, ExtResource("14_8i1kx")]({
 })
 metadata/_custom_type_script = ExtResource("14_utoey")
 
-[node name="Hello" type="Node"]
+[sub_resource type="SystemFont" id="SystemFont_r657h"]
+font_names = PackedStringArray("Iosevka", "Liberation Mono", "DejaVu Sans Mono", "Lucida Console", "Cascadia Code", "Consolas", "Monospace")
+
+[sub_resource type="LabelSettings" id="LabelSettings_r657h"]
+font = SubResource("SystemFont_r657h")
+font_size = 12
+font_color = Color(0.982237, 0.86182, 0.39165, 1)
+outline_size = 1
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Hello" type="Node" node_paths=PackedStringArray("zeditor")]
 script = ExtResource("1_j2q8x")
-types = Array[Script]([ExtResource("3_e2u21")])
+zeditor = NodePath("Bench/Zeditor")
+types = Array[Script]([ExtResource("3_e2u21"), ExtResource("3_jof2w")])
 
 [node name="Bench" type="Node" parent="." node_paths=PackedStringArray("workspace", "phases")]
 script = ExtResource("1_sy5k4")
@@ -134,7 +155,7 @@ shell_type = 1
 
 [node name="LaunchZeditor" type="Node" parent="Bench/Phases/Edit" node_paths=PackedStringArray("zeditor")]
 script = ExtResource("6_l6pdb")
-zeditor = NodePath("../../../../Zeditor")
+zeditor = NodePath("../../../Zeditor")
 
 [node name="Eval" type="Node" parent="Bench/Phases"]
 script = ExtResource("6_tda05")
@@ -172,21 +193,14 @@ shape = SubResource("WorldBoundaryShape3D_tda05")
 [node name="Camera3D" type="Camera3D" parent="Bench/Workspace" groups=["CameraPlus3D"]]
 transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 6.12372, 5, 6.12372)
 top_level = true
+fov = 45.0
+far = 1000.0
 script = ExtResource("5_bss38")
 view_mode = 1
 metadata/_custom_type_script = "uid://bi4xpn1ai8olr"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Bench/Workspace"]
 transform = Transform3D(0.866025, 0.25, 0.433013, -0.5, 0.433013, 0.75, 0, -0.866025, 0.5, 0, 15, 0)
-
-[node name="Area3D" type="Area3D" parent="Bench/Workspace"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Bench/Workspace/Area3D"]
-shape = SubResource("BoxShape3D_r657h")
-debug_color = Color(0.166122, 0.866274, 1, 0.85098)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Bench/Workspace/Area3D/CollisionShape3D"]
-mesh = SubResource("BoxMesh_f0urt")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Bench/Workspace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
@@ -213,6 +227,28 @@ shape = SubResource("SphereShape3D_aumiy")
 mesh = SubResource("SphereMesh_l6pdb")
 skeleton = NodePath("../..")
 
+[node name="GridFloor" type="MeshInstance3D" parent="Bench/Workspace"]
+mesh = SubResource("QuadMesh_whyow")
+
+[node name="Zeditor" type="Node" parent="Bench" node_paths=PackedStringArray("toolbag", "item_tray")]
+script = ExtResource("9_f0urt")
+commands = SubResource("Resource_vxe8i")
+toolbag = NodePath("Toolbag")
+item_tray = NodePath("ItemTray")
+
+[node name="Toolbag" type="Node" parent="Bench/Zeditor"]
+script = ExtResource("12_j2aeq")
+metadata/_custom_type_script = "uid://bk5a3tflnvat0"
+
+[node name="Highlighter" type="Node" parent="Bench/Zeditor"]
+script = ExtResource("12_aj2tw")
+active_pointer_scn = ExtResource("9_jfkdj")
+
+[node name="BoxZeditorModule" type="Node" parent="Bench/Zeditor"]
+script = ExtResource("12_jcig6")
+
+[node name="ItemTray" parent="Bench/Zeditor" instance=ExtResource("12_1dpvp")]
+
 [node name="DebugOverlay" type="BoxContainer" parent="Bench"]
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -235,30 +271,11 @@ visible = false
 layout_mode = 2
 script = ExtResource("18_nxqlp")
 
-[node name="Zeditor" type="Node" parent="." node_paths=PackedStringArray("toolbag", "item_tray")]
-script = ExtResource("9_f0urt")
-commands = SubResource("Resource_vxe8i")
-toolbag = NodePath("Toolbag")
-item_tray = NodePath("ItemTray")
-
-[node name="Toolbag" type="Node" parent="Zeditor"]
-script = ExtResource("12_j2aeq")
-metadata/_custom_type_script = "uid://bk5a3tflnvat0"
-
-[node name="Highlighter" type="Node" parent="Zeditor"]
-script = ExtResource("12_aj2tw")
-active_pointer_scn = ExtResource("9_jfkdj")
-
-[node name="BoxZeditorModule" type="Node" parent="Zeditor"]
-script = ExtResource("12_jcig6")
-
-[node name="ItemTray" parent="Zeditor" instance=ExtResource("12_1dpvp")]
-
 [node name="Evaluator" type="Node" parent="."]
 
-[connection signal="halting" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="hide"]
-[connection signal="launching" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="show"]
-[connection signal="tool_activated" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_activated"]
-[connection signal="tool_deactivating" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_deactivating"]
-[connection signal="tool_operation_ending" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_ending"]
-[connection signal="tool_operation_started" from="Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_started"]
+[connection signal="halting" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="hide"]
+[connection signal="launching" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="show"]
+[connection signal="tool_activated" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_activated"]
+[connection signal="tool_deactivating" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_deactivating"]
+[connection signal="tool_operation_ending" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_ending"]
+[connection signal="tool_operation_started" from="Bench/Zeditor" to="Bench/DebugOverlay/ZeditorToolLabel" method="_on_zeditor_tool_operation_started"]

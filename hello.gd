@@ -6,10 +6,10 @@ const PHASE_NAME_EDIT := &"Edit"
 const PHASE_NAME_RUN := &"Eval"
 
 
+@export var zeditor: Zeditor
 @export var types: Array[Script] = []
 
 @onready var bench: Bench = $Bench
-@onready var zeditor: Zeditor = $Zeditor
 
 var _data
 
@@ -93,8 +93,8 @@ func _delete_one() -> void:
 	if parts.is_empty():
 		return
 	var id := parts[randi() % parts.size()]
-	var sel := ZeditorSelection.State.new()
-	sel.add(ZeditorSelection.Selectable.create(Zed.ItemType.PART, [ id ]))
+	var sel := Zelection.new()
+	sel.add(Zed.TYPE_PART, ZeditorSelection.CONTEXT_DEFAULT, id)
 	zeditor.command(&"erase", sel)
 
 
@@ -119,7 +119,7 @@ func _edit_phase_input(event: InputEvent) -> void:
 		_delete_one()
 	elif event is InputEventKey:
 		var kev := event as InputEventKey
-		if kev.pressed && kev.ctrl_pressed:
+		if kev.pressed:
 			if kev.keycode == KEY_1:
 				zeditor.command(&"move")
 

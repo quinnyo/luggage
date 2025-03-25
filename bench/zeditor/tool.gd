@@ -12,7 +12,7 @@ class Context:
 	signal operation_ending(op: ZedOperation, cancelled: bool)
 
 	var bench: Bench
-	var selection: ZeditorSelection.State
+	var selection: Zelection
 
 	var _tool: ZeditorTool
 	var _operation: ZedOperation
