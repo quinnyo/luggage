@@ -13,11 +13,11 @@ func _cmd_invoke(context: Invocation) -> int:
 			var part_id: int = sel_context
 			for i in range(items.size()):
 				var index: int = items[i]
-				var initial_position := zhost.part_armature_get_transform(part_id, index).origin
+				var initial_position := zhost.part_get_transform(part_id, index).origin
 				op_drag.add_target(initial_position, func(value: Vector3):
-					var xf := zhost.part_armature_get_transform(part_id, index)
+					var xf := zhost.part_get_transform(part_id, index)
 					xf.origin = value
-					zhost.part_armature_set_transform(part_id, index, xf)
+					zhost.part_set_transform(part_id, index, xf)
 				)
 	)
 	if op_drag.has_target():

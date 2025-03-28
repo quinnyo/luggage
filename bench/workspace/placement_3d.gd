@@ -27,4 +27,4 @@ func _enter_tree() -> void:
 
 func _process(_delta: float) -> void:
 	if sub_id_is_armature_index:
-		transform = _bench.get_zed_host().part_armature_get_transform(part_id, sub_id)
+		transform = _bench.get_zed_host().part_get_transform(part_id, sub_id)

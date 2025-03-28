@@ -107,20 +107,20 @@ func notify_part_changed(part_id: int) -> void:
 
 
 func part_has_pose(part_id: int) -> bool:
-	return part_armature_get_size(part_id) > 0
+	return part_get_datum_count(part_id) > 0
 
 
-func part_armature_get_transform(part_id: int, index: int) -> Transform3D:
-	return Transform3D(Basis.IDENTITY, _get_part(part_id).instance.armature_get_position(index))
+func part_get_transform(part_id: int, index: int) -> Transform3D:
+	return Transform3D(Basis.IDENTITY, _get_part(part_id).instance.get_position(index))
 
 
-func part_armature_set_transform(part_id: int, index: int, value: Transform3D) -> void:
-	_get_part(part_id).instance.armature_set_position(index, value.origin)
-	_get_part(part_id).instance.armature_set_euler(index, value.basis.get_euler())
+func part_set_transform(part_id: int, index: int, value: Transform3D) -> void:
+	_get_part(part_id).instance.set_position(index, value.origin)
+	_get_part(part_id).instance.set_euler(index, value.basis.get_euler())
 
 
-func part_armature_get_size(part_id: int) -> int:
-	return _get_part(part_id).instance.armature_get_size()
+func part_get_datum_count(part_id: int) -> int:
+	return _get_part(part_id).instance.get_datum_count()
 
 
 func _get_part(part_id: int) -> PartBox:

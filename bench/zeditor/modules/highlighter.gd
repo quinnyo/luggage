@@ -32,7 +32,7 @@ func _module_on_zeditor_editable_deactivated(editable_id: int) -> void:
 func _process(_delta: float) -> void:
 	var zhost := get_bench().get_zed_host()
 	for editable_id in _editables:
-		if zhost.has_part(editable_id) && zhost.part_armature_get_size(editable_id):
-			var xf := zhost.part_armature_get_transform(editable_id, 0)
+		if zhost.has_part(editable_id) && zhost.part_get_datum_count(editable_id):
+			var xf := zhost.part_get_transform(editable_id, 0)
 			var highlight := _editables[editable_id]
 			highlight.pointer.global_position = xf.origin
