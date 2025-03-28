@@ -10,6 +10,14 @@ func get_datum_count() -> int:
 	return 0
 
 
+## Returns the class (category) of the datum at [param p_index].
+@warning_ignore("unused_parameter")
+func datum_get_class(p_index: int) -> Zed.DatumClass:
+	assert(get_datum_count() == 0, "Index out of range. This ZedPart has zero datums.")
+	assert(get_datum_count() != 0, "`datum_get_class` is not implemented but `get_datum_count` returned non-zero")
+	return Zed.DatumClass.VOID
+
+
 ## Constrains [param p_position] to the ultimate value of the datum's position
 ## following a call to [method set_position] with the same arguments.
 ## [br][br]The constrained value is returned without modifying the datum.

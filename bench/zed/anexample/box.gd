@@ -15,6 +15,11 @@ func get_datum_count() -> int:
 	return 1
 
 
+func datum_get_class(p_index: int) -> Zed.DatumClass:
+	assert(p_index == 0)
+	return Zed.DatumClass.OBJECT
+
+
 func constrain_position(p_index: int, p_position: Vector3) -> Vector3:
 	assert(p_index == 0)
 	return p_position.snapped(size / 2.0)
