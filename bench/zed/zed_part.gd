@@ -18,6 +18,16 @@ func datum_get_class(p_index: int) -> Zed.DatumClass:
 	return Zed.DatumClass.VOID
 
 
+## Search for a datum with a class equal to [param datum_class] at or above index [param start_idx].
+## Returns the index of the first matching datum, or -1 if no matches were found.
+func find_datum_by_class(datum_class: Zed.DatumClass, start_idx: int = 0) -> int:
+	assert(datum_class != Zed.DatumClass.VOID)
+	for i in range(start_idx, get_datum_count()):
+		if datum_get_class(i) == datum_class:
+			return i
+	return -1
+
+
 ## Constrains [param p_position] to the ultimate value of the datum's position
 ## following a call to [method set_position] with the same arguments.
 ## [br][br]The constrained value is returned without modifying the datum.
