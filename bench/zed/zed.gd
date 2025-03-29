@@ -9,6 +9,7 @@ enum ShellType {
 }
 
 
+## Provide classification of ZedPart pose datums (control points).
 enum DatumClass {
 	## Invalid class. No extant datum should have this class.
 	VOID,

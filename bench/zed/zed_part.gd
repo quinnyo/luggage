@@ -10,7 +10,7 @@ func get_datum_count() -> int:
 	return 0
 
 
-## Returns the class (category) of the datum at [param p_index].
+## Returns the class (category) of the datum at [param p_index]. See [enum Zed.DatumClass].
 @warning_ignore("unused_parameter")
 func datum_get_class(p_index: int) -> Zed.DatumClass:
 	assert(get_datum_count() == 0, "Index out of range. This ZedPart has zero datums.")
