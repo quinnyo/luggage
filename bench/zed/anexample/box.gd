@@ -25,19 +25,9 @@ func constrain_position(p_index: int, p_position: Vector3) -> Vector3:
 	return p_position.snapped(size / 2.0)
 
 
-func constrain_euler(p_index: int, _p_euler: Vector3) -> Vector3:
-	assert(p_index == 0)
-	return Vector3()
-
-
 func set_position(p_index: int, p_position: Vector3) -> void:
 	assert(p_index == 0)
 	position = constrain_position(p_index, p_position)
-
-
-func set_euler(p_index: int, _p_euler: Vector3) -> void:
-	assert(p_index == 0)
-	return
 
 
 func get_position(p_index: int) -> Vector3:
@@ -45,9 +35,19 @@ func get_position(p_index: int) -> Vector3:
 	return position
 
 
-func get_euler(p_index: int) -> Vector3:
+func constrain_rotation(p_index: int, _p_rotation: Quaternion) -> Quaternion:
 	assert(p_index == 0)
-	return Vector3()
+	return Quaternion()
+
+
+func set_rotation(p_index: int, _p_rotation: Quaternion) -> void:
+	assert(p_index == 0)
+	return
+
+
+func get_rotation(p_index: int) -> Quaternion:
+	assert(p_index == 0)
+	return Quaternion()
 
 
 func _create_visual() -> Node3D:

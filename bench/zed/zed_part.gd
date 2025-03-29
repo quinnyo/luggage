@@ -36,24 +36,9 @@ func constrain_position(p_index: int, p_position: Vector3) -> Vector3:
 	return Vector3()
 
 
-## Constrains [param p_euler] to the ultimate value of the datum's rotation
-## following a call to [method set_euler] with the same arguments.
-## [br][br]The constrained value is returned without modifying the datum.
-@warning_ignore("unused_parameter")
-func constrain_euler(p_index: int, p_euler: Vector3) -> Vector3:
-	return Vector3()
-
-
 ## Assign [param p_position] to the datum at [param p_index] after applying constraints.
 @warning_ignore("unused_parameter")
 func set_position(p_index: int, p_position: Vector3) -> void:
-	return
-
-
-## Assign [param p_euler] to the datum at [param p_index] after applying constraints.
-## [param p_euler] is rotation as euler angles, in radians.
-@warning_ignore("unused_parameter")
-func set_euler(p_index: int, p_euler: Vector3) -> void:
 	return
 
 
@@ -63,8 +48,21 @@ func get_position(p_index: int) -> Vector3:
 	return Vector3()
 
 
-## Return the rotation of the datum at [param p_index].
-## [br][br]The result is provided as euler angles in radians.
+## Constrains [param p_rotation] to the ultimate value of the datum's rotation
+## following a call to [method set_rotation] with the same arguments.
+## [br][br]The constrained value is returned without modifying the datum.
 @warning_ignore("unused_parameter")
-func get_euler(p_index: int) -> Vector3:
-	return Vector3()
+func constrain_rotation(p_index: int, p_rotation: Quaternion) -> Quaternion:
+	return Quaternion()
+
+
+## Assign [param p_rotation] to the datum at [param p_index] after applying constraints.
+@warning_ignore("unused_parameter")
+func set_rotation(p_index: int, p_rotation: Quaternion) -> void:
+	return
+
+
+## Return the rotation of the datum at [param p_index].
+@warning_ignore("unused_parameter")
+func get_rotation(p_index: int) -> Quaternion:
+	return Quaternion()

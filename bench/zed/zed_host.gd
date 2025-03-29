@@ -111,12 +111,14 @@ func part_has_pose(part_id: int) -> bool:
 
 
 func part_get_transform(part_id: int, index: int) -> Transform3D:
-	return Transform3D(Basis.IDENTITY, _get_part(part_id).instance.get_position(index))
+	var origin := _get_part(part_id).instance.get_position(index)
+	var rotation := _get_part(part_id).instance.get_rotation(index)
+	return Transform3D(Basis(rotation), origin)
 
 
 func part_set_transform(part_id: int, index: int, value: Transform3D) -> void:
 	_get_part(part_id).instance.set_position(index, value.origin)
-	_get_part(part_id).instance.set_euler(index, value.basis.get_euler())
+	_get_part(part_id).instance.set_rotation(index, value.basis.get_rotation_quaternion())
 
 
 func part_get_datum_count(part_id: int) -> int:
