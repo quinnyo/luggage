@@ -175,6 +175,9 @@ shell_type = 2
 script = ExtResource("7_au6eq")
 metadata/_custom_type_script = "uid://db8j305je0083"
 
+[node name="DisplayParts" type="Node" parent="Bench"]
+script = ExtResource("29_ouvrk")
+
 [node name="Workspace" type="Node3D" parent="Bench"]
 script = ExtResource("6_qn3nj")
 
@@ -276,9 +279,6 @@ script = ExtResource("10_f0urt")
 visible = false
 layout_mode = 2
 script = ExtResource("18_nxqlp")
-
-[node name="Node" type="Node" parent="Bench"]
-script = ExtResource("29_ouvrk")
 
 [node name="Evaluator" type="Node" parent="."]
 
