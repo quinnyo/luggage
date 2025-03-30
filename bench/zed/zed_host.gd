@@ -15,12 +15,6 @@ var _parts: Dictionary[int, PartBox]
 var _id_next: int = 1
 
 
-func setup_context(bench: Bench) -> void:
-	_bench = bench
-	_bench.get_workspace().shell_appearing.connect(_on_shell_appearing)
-	_bench.get_workspace().shell_disappearing.connect(_on_shell_disappearing)
-
-
 func get_part_count() -> int:
 	return _parts.size()
 
@@ -155,6 +149,23 @@ func _on_shell_appearing(type: Zed.ShellType) -> void:
 func _on_shell_disappearing(_type: Zed.ShellType) -> void:
 	for part in _parts.values():
 		_clear_shell(part)
+
+
+func _init() -> void:
+	name = &"ZedHost"
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_ENTER_TREE:
+		_bench = Bench.find_bench_parent(self)
+		if _bench:
+			_bench.get_workspace().shell_appearing.connect(_on_shell_appearing)
+			_bench.get_workspace().shell_disappearing.connect(_on_shell_disappearing)
+	elif what == NOTIFICATION_EXIT_TREE:
+		if _bench:
+			_bench.get_workspace().shell_appearing.disconnect(_on_shell_appearing)
+			_bench.get_workspace().shell_disappearing.disconnect(_on_shell_disappearing)
+			_bench = null
 
 
 class PartBox:

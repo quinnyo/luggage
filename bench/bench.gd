@@ -2,7 +2,6 @@ class_name Bench extends Node
 
 
 const _ZedClassTable := preload("zed/zed_class_table.gd")
-const _ZedHost := preload("zed/zed_host.gd")
 
 
 signal phase_change_started(from: BenchPhase, to: BenchPhase)
@@ -16,7 +15,7 @@ var notices := Notices.new()
 var selection: ZeditorSelection = ZeditorSelection.new()
 
 var _zed_class_table: _ZedClassTable
-var _zed_host: _ZedHost
+var _zed_host: ZedHost
 
 var _active_phase: BenchPhase
 var _dest_phase: BenchPhase
@@ -37,12 +36,18 @@ func get_zed_class_table() -> _ZedClassTable:
 	return _zed_class_table
 
 
-func get_zed_host() -> _ZedHost:
+func get_zed_host() -> ZedHost:
 	if not _zed_host:
-		_zed_host = _ZedHost.new()
-		_zed_host.name = "ZedHost"
-		add_child(_zed_host)
-		_zed_host.setup_context(self)
+		var child := get_node_or_null(^"ZedHost")
+		if child and child is ZedHost:
+			_zed_host = child
+		else:
+			_zed_host = ZedHost.new()
+			_zed_host.name = &"ZedHost"
+			if is_node_ready():
+				add_child(_zed_host)
+			else:
+				add_child.call_deferred(_zed_host)
 	return _zed_host
 
 

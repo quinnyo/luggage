@@ -1,10 +1,11 @@
-[gd_scene load_steps=46 format=3 uid="uid://24pq7l31708a"]
+[gd_scene load_steps=48 format=3 uid="uid://24pq7l31708a"]
 
 [ext_resource type="Script" uid="uid://cfokd65jkkpl5" path="res://hello.gd" id="1_j2q8x"]
 [ext_resource type="Script" uid="uid://ciwccif33sdhj" path="res://bench/bench.gd" id="1_sy5k4"]
 [ext_resource type="Script" uid="uid://bsjphndhgyt5o" path="res://bench/zed/anexample/box_zed.gd" id="3_e2u21"]
 [ext_resource type="Script" uid="uid://c2hxi6j7lj13" path="res://parts/conveyor/conveyor_section_class.gd" id="3_jof2w"]
 [ext_resource type="Script" uid="uid://bi4xpn1ai8olr" path="res://viewport/camera/camera_plus_3d.gd" id="5_bss38"]
+[ext_resource type="Script" uid="uid://2ohj2uwhphkq" path="res://bench/zed/zed_host.gd" id="5_k4h3f"]
 [ext_resource type="Script" uid="uid://cc17s1yuxyvqy" path="res://bench/phase_zed_control.gd" id="5_tda05"]
 [ext_resource type="Script" uid="uid://lp4df172x6r1" path="res://bench/zeditor/launch_zeditor.gd" id="6_l6pdb"]
 [ext_resource type="Script" uid="uid://ojgm0ce8lkjc" path="res://bench/workspace/workspace.gd" id="6_qn3nj"]
@@ -28,6 +29,7 @@
 [ext_resource type="Script" uid="uid://dutnppmb3dn6l" path="res://bench/zeditor/commands/redo.gd" id="17_gupn2"]
 [ext_resource type="Script" uid="uid://dwv22edtrfnru" path="res://bench/zeditor/commands/erase.gd" id="18_gupn2"]
 [ext_resource type="Script" uid="uid://ncc077aca8gg" path="res://bench/extra/zeditor_tool_label.gd" id="18_nxqlp"]
+[ext_resource type="Script" uid="uid://ba1njp5bjo6vs" path="res://bench/extra/display_parts.gd" id="29_ouvrk"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tda05"]
 
@@ -138,6 +140,10 @@ script = ExtResource("1_sy5k4")
 workspace = NodePath("Workspace")
 phases = [NodePath("Phases/Default"), NodePath("Phases/Edit"), NodePath("Phases/Eval")]
 metadata/_custom_type_script = "uid://ciwccif33sdhj"
+
+[node name="ZedHost" type="Node" parent="Bench"]
+script = ExtResource("5_k4h3f")
+metadata/_custom_type_script = "uid://2ohj2uwhphkq"
 
 [node name="Phases" type="Node" parent="Bench"]
 
@@ -270,6 +276,9 @@ script = ExtResource("10_f0urt")
 visible = false
 layout_mode = 2
 script = ExtResource("18_nxqlp")
+
+[node name="Node" type="Node" parent="Bench"]
+script = ExtResource("29_ouvrk")
 
 [node name="Evaluator" type="Node" parent="."]
 
