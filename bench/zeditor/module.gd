@@ -51,7 +51,6 @@ func _module_editable_released(editable_id: int) -> void:
 	return
 
 
-@warning_ignore("unused_parameter")
 func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 	if !_zeditor.editable_is_locked(editable_id) && _module_handles_editable(editable_id):
 		if _zeditor.module_is_active(_id):
@@ -69,7 +68,6 @@ func _module_on_zeditor_editable_activated(editable_id: int) -> void:
 			)
 
 
-@warning_ignore("unused_parameter")
 func _module_on_zeditor_editable_deactivated(editable_id: int) -> void:
 	if !_holding.has(editable_id):
 		return

@@ -30,10 +30,7 @@ func remove_all(type: StringName, context: Variant) -> void:
 
 
 func has(type: StringName, context: Variant, item: Variant) -> bool:
-	var result := _state.has(type, context, item)
-	if result:
-		changed.emit()
-	return result
+	return _state.has(type, context, item)
 
 
 func has_type(type: StringName) -> bool:
