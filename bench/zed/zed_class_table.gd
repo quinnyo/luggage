@@ -3,17 +3,14 @@ extends RefCounted
 ## A container of (ZedClass) part class definitions.
 
 
-const _ZedClass := preload("zed_class.gd")
-
-
 class Entry:
-	var type: _ZedClass
+	var type: ZedClass
 	var type_info: Dictionary[StringName, Variant]
 	var uid: int:
 		get:
-			return type_info.get(_ZedClass.TYPE_INFO_UID, ResourceUID.INVALID_ID)
+			return type_info.get(ZedClass.TYPE_INFO_UID, ResourceUID.INVALID_ID)
 
-	func setup(p_type: _ZedClass) -> void:
+	func setup(p_type: ZedClass) -> void:
 		type = p_type
 		type_info = type.get_type_info()
 
@@ -22,7 +19,7 @@ var _table: Dictionary[StringName, Entry] = {}
 var _uid_table: Dictionary[int, Entry] = {}
 
 
-func add_type(type: _ZedClass) -> void:
+func add_type(type: ZedClass) -> void:
 	if has_type(type.get_type_name()):
 		push_error("Cannot add type (%s): type with ID already exists" % [ type ])
 		return
@@ -40,7 +37,7 @@ func has_type(id: StringName) -> bool:
 	return _table.has(id) && _table[id].type
 
 
-func get_type(id: StringName) -> _ZedClass:
+func get_type(id: StringName) -> ZedClass:
 	return _table[id].type
 
 
@@ -48,15 +45,15 @@ func has_type_uid(uid: int) -> bool:
 	return _uid_table.has(uid)
 
 
-func get_type_uid(uid: int) -> _ZedClass:
+func get_type_uid(uid: int) -> ZedClass:
 	return _uid_table[uid].type
 
 
-func lookup_type_info(ti: Dictionary[StringName, Variant]) -> _ZedClass:
-	var uid: int = ti.get(_ZedClass.TYPE_INFO_UID)
+func lookup_type_info(ti: Dictionary[StringName, Variant]) -> ZedClass:
+	var uid: int = ti.get(ZedClass.TYPE_INFO_UID)
 	if has_type_uid(uid):
 		return get_type_uid(uid)
-	var type_name: StringName = ti.get(_ZedClass.TYPE_INFO_TYPE_NAME)
+	var type_name: StringName = ti.get(ZedClass.TYPE_INFO_TYPE_NAME)
 	if has_type(type_name):
 		return get_type(type_name)
 	# TODO: recovery attempt? -- try load resource
@@ -66,8 +63,8 @@ func lookup_type_info(ti: Dictionary[StringName, Variant]) -> _ZedClass:
 	return null
 
 
-func get_classes() -> Array[_ZedClass]:
-	var result: Array[_ZedClass] = []
+func get_classes() -> Array[ZedClass]:
+	var result: Array[ZedClass] = []
 	for entry in _table.values():
 		result.push_back(entry.type)
 	return result
