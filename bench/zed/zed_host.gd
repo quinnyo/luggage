@@ -119,6 +119,10 @@ func part_get_datum_count(part_id: int) -> int:
 	return _get_part(part_id).instance.get_datum_count()
 
 
+func part_get_datum_class(part_id: int, index: int) -> Zed.DatumClass:
+	return _get_part(part_id).instance.datum_get_class(index)
+
+
 func _get_part(part_id: int) -> PartBox:
 	if !has_part(part_id):
 		push_error("Part not found (0x%X)" % [ part_id ])

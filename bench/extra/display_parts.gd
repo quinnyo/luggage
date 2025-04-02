@@ -3,6 +3,22 @@ extends Node
 ## For each tracked part,
 ## - draw an indicator at every datum point
 
+
+const _ZedShapes := preload("shapes.gd")
+
+enum IndicatorClass {
+	GENERIC,
+	OBJECT,
+	CONTROL_POINT,
+}
+
+enum HighlightClass {
+	NONE,
+	SELECTED,
+	DISABLED,
+}
+
+
 @export var color_1a := Color(0.29, 0.787, 0.895)
 @export var color_1b := Color(0.156, 0.322, 0.344)
 @export var color_2a := Color(0.975, 0.569, 0.822)
@@ -11,20 +27,43 @@ extends Node
 @export var color_3b := Color(0.521, 0.283, 0.228)
 
 
+@export var highlight_colors: Dictionary[HighlightClass, PackedColorArray]
+
+
 var targets: Dictionary[int, Dictionary]
 
-var _needle_mesh: Mesh
-var _needle_material: Array[StandardMaterial3D]
+var _indicator_meshes: Dictionary[IndicatorClass, Mesh]
+var _highlight_materials: Dictionary[HighlightClass, Material]
 
-var _vis_available_index
+var _vis_available_index: int
 var _vis_nodes: Array[MeshInstance3D]
 
+var bench: Bench
+var zhost: ZedHost
 
-func draw_thing(transform: Transform3D, material_idx: int, _likely_some_other_stuff = null) -> void:
+
+func draw_indicator(transform: Transform3D, indicator_class: IndicatorClass, highlight_class: HighlightClass) -> void:
 	var mi := _next_vis()
-	mi.material_override = _needle_material[material_idx]
+	if _indicator_meshes.has(indicator_class):
+		mi.mesh = _indicator_meshes[indicator_class]
+	if _highlight_materials.has(highlight_class):
+		mi.material_override = _highlight_materials[highlight_class]
+
 	mi.global_transform = transform
 	mi.show()
+
+
+func _draw_part_datum(part_id: int, idatum: int) -> void:
+	var datum_class := zhost.part_get_datum_class(part_id, idatum)
+	var indicator_class := IndicatorClass.GENERIC
+	match datum_class:
+		Zed.DatumClass.VOID: return
+		Zed.DatumClass.OBJECT: indicator_class = IndicatorClass.OBJECT
+		Zed.DatumClass.ARMATURE: indicator_class = IndicatorClass.CONTROL_POINT
+	var highlight_class := HighlightClass.NONE
+	if bench.selection.has(Zed.TYPE_ARMATURE_POINT, part_id, idatum):
+		highlight_class = HighlightClass.SELECTED
+	draw_indicator(zhost.part_get_transform(part_id, idatum), indicator_class, highlight_class)
 
 
 func _next_vis() -> MeshInstance3D:
@@ -33,8 +72,9 @@ func _next_vis() -> MeshInstance3D:
 		mi = _vis_nodes[_vis_available_index]
 	else:
 		mi = MeshInstance3D.new()
-		mi.mesh = _needle_mesh
-		mi.material_override = _needle_material[0]
+		#mi.mesh = _needle_mesh
+		#if mi.get_surface_override_material_count():
+		#mi.material_override = _needle_material[0]
 		add_child(mi)
 		_vis_nodes.push_back(mi)
 
@@ -74,26 +114,34 @@ func _on_part_removed(part_id: int) -> void:
 
 
 func _ready() -> void:
-	var bench := Bench.find_bench_parent(self)
-	bench.get_zed_host().part_added.connect(_on_part_added)
-	bench.get_zed_host().part_removed.connect(_on_part_removed)
+	bench = Bench.find_bench_parent(self)
+	zhost = bench.get_zed_host()
+	zhost.part_added.connect(_on_part_added)
+	zhost.part_removed.connect(_on_part_removed)
 
-	_needle_mesh = ZedShapes.build_needle_wire_mesh()
-
-	_needle_material = [
-		_create_material(color_1a, color_1b),
-		_create_material(color_2a, color_2b),
-		_create_material(color_3a, color_3b),
-	]
+	_indicator_meshes[IndicatorClass.GENERIC] = _ZedShapes.mesh_indicator_point()
+	_indicator_meshes[IndicatorClass.OBJECT] = _ZedShapes.mesh_indicator_cross()
+	_indicator_meshes[IndicatorClass.CONTROL_POINT] = _ZedShapes.mesh_indicator_pin()
+	for highlight_class in HighlightClass.values():
+		var color_a := Color.MAGENTA
+		var color_b := Color(color_a.darkened(0.5), 0.5)
+		if highlight_colors.has(highlight_class):
+			var colors := highlight_colors[highlight_class]
+			if !colors.is_empty():
+				color_a = colors[0]
+			if colors.size() > 1:
+				color_b = colors[1]
+			else:
+				color_b = Color.from_ok_hsl(color_a.ok_hsl_h - 0.12, color_a.ok_hsl_s - 0.36, color_a.ok_hsl_l - 0.39, 0.5)
+		_highlight_materials[highlight_class] = _create_material(color_a, color_b)
 
 
 func _process(_delta: float) -> void:
 	_vis_available_index = 0
-	var bench := Bench.find_bench_parent(self)
-	var zhost := bench.get_zed_host()
-	for part_id: int in targets:
+
+	for part_id: int in targets: #zhost.get_all_part_ids():
 		for idatum in range(zhost.part_get_datum_count(part_id)):
-			draw_thing(zhost.part_get_transform(part_id, idatum), 0)
+			_draw_part_datum(part_id, idatum)
 
 	while _vis_available_index < _vis_nodes.size():
 		_vis_nodes[_vis_available_index].hide()

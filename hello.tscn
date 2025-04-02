@@ -177,6 +177,11 @@ metadata/_custom_type_script = "uid://db8j305je0083"
 
 [node name="DisplayParts" type="Node" parent="Bench"]
 script = ExtResource("29_ouvrk")
+highlight_colors = Dictionary[int, PackedColorArray]({
+0: PackedColorArray(0.567473, 0.617342, 0.653246, 1, 0.160843, 0.174429, 0.17926, 1),
+1: PackedColorArray(0.986414, 0.758393, 0.340069, 1, 0.52117, 0.283384, 0.228458, 1),
+2: PackedColorArray(0.57098, 0.57098, 0.57098, 1, 0.331019, 0.331019, 0.331019, 1)
+})
 
 [node name="Workspace" type="Node3D" parent="Bench"]
 script = ExtResource("6_qn3nj")
