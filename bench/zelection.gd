@@ -37,8 +37,8 @@ func clone() -> Zelection:
 func add(type: StringName, context: Variant, item: Variant) -> bool:
 	var tc := Selcell.tc_key(type, context)
 	# Merge if TC exists
-	if _tc_cells.has(tc):
-		var other := _tc_cells[tc]
+	var other := _get_cell(tc)
+	if other:
 		if !other.has_item(item):
 			other.add_item(item)
 			_notify_changed()
@@ -55,23 +55,22 @@ func add(type: StringName, context: Variant, item: Variant) -> bool:
 ## Returns [code]true[/code] if an item was removed or [code]false[/code] otherwise.
 func remove(type: StringName, context: Variant, item: Variant) -> bool:
 	var tc := Selcell.tc_key(type, context)
-	if _tc_cells.has(tc):
-		var selcell := _tc_cells[tc]
-		if selcell.has(item):
-			selcell.remove_item(item)
-			if selcell.size() == 0:
-				selcell.free()
-				_tc_cells.erase(tc)
-			_notify_changed()
-			return true
+	var selcell := _get_cell(tc)
+	if selcell && selcell.has_item(item):
+		selcell.remove_item(item)
+		if selcell.size() == 0:
+			selcell.free()
+			_tc_cells.erase(tc)
+		_notify_changed()
+		return true
 	return false
 
 
 ## Remove all items matching TC.
 func remove_all(type: StringName, context: Variant) -> int:
 	var tc := Selcell.tc_key(type, context)
-	if _tc_cells.has(tc):
-		var selcell := _tc_cells[tc]
+	var selcell := _get_cell(tc)
+	if selcell:
 		var n := selcell.size()
 		selcell.free()
 		_tc_cells.erase(tc)
@@ -83,9 +82,9 @@ func remove_all(type: StringName, context: Variant) -> int:
 ## Check if the selection contains a matching item.
 ## Returns [code]true[/code] if a match was found or [code]false[/code] otherwise.
 func has(type: StringName, context: Variant, item: Variant) -> bool:
-	var tc := Selcell.tc_key(type, context)
-	if _tc_cells.has(tc):
-		return _tc_cells[tc].has_item(item)
+	var selcell := _get_cell(Selcell.tc_key(type, context))
+	if selcell:
+		return selcell.has_item(item)
 	return false
 
 
@@ -148,6 +147,25 @@ func for_each_item_where_type(type: StringName, callable: Callable) -> void:
 				callable.call(selcell.type, selcell.context, item)
 
 
+func dump_str() -> String:
+	var lines := PackedStringArray(["%3d cells, %3d items" % [ _tc_cells.size(), size() ]])
+	for tc in _tc_cells:
+		var selcell := _tc_cells[tc]
+		lines.push_back("  cell %8X (%s, %s), %d items:" % [ tc, selcell.type, selcell.context, selcell.size() ])
+		lines.push_back("         TCI: VALUE")
+		for tci in selcell.items:
+			lines.push_back("    %8X: %s" % [ tci, selcell.items[tci] ])
+	return "\n".join(lines)
+
+
+func _get_cell(p_tc: int) -> Selcell:
+	if _tc_cells.has(p_tc):
+		var selcell: Selcell = _tc_cells[p_tc]
+		assert(is_instance_valid(selcell))
+		return selcell
+	return null
+
+
 func _notify_changed() -> void:
 	changed.emit()
 
@@ -197,7 +215,7 @@ class Selcell extends Object:
 		return hash([p_type, p_context, p_item])
 
 	static func create_single(p_type: StringName, p_context: Variant, p_item: Variant) -> Selcell:
-		return new(p_type, p_context, { p_item: p_item } )
+		return new(p_type, p_context, { tci_key(p_type, p_context, p_item): p_item } )
 
 	func _init(p_type: StringName, p_context: Variant, p_items: Dictionary = {}) -> void:
 		type = p_type
