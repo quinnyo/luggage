@@ -35,7 +35,8 @@ func _do() -> void:
 	for id in _bind_targets:
 		zhost.remove_part(id)
 		# ensure erased objects are not selected (in the live selection)
-		get_selection().remove(Zed.TYPE_PART, ZeditorSelection.CONTEXT_DEFAULT, id)
+		if get_selection().has(Zed.TYPE_PART, ZeditorSelection.CONTEXT_DEFAULT, id):
+			get_selection().remove(Zed.TYPE_PART, ZeditorSelection.CONTEXT_DEFAULT, id)
 		get_selection().remove_all(Zed.TYPE_ARMATURE_POINT, id)
 
 
