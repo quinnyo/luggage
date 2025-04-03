@@ -170,6 +170,19 @@ func _notify_changed() -> void:
 	changed.emit()
 
 
+func _contents_to_string() -> String:
+	if is_empty():
+		return "empty"
+	if _tc_cells.size() == 1:
+		var selcell := _get_cell(_tc_cells.keys()[0])
+		return "'%s' %s %s" % [ selcell.type, selcell.context, selcell.items.values() ]
+	return "%d items" % [ size() ]
+
+
+func _to_string() -> String:
+	return "Zelection(%s)" % [ _contents_to_string() ]
+
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
 		for selcell in _tc_cells.values():

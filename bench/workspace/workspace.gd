@@ -281,7 +281,8 @@ func _set_picked(object: Node) -> void:
 
 func _process(_delta: float) -> void:
 	var vpp := ViewportPlus.get_viewport_plus(self)
-	_set_picked(vpp.get_picking().get_object())
+	if vpp.get_picking().get_object() is Node:
+		_set_picked(vpp.get_picking().get_object())
 
 
 func _init() -> void:

@@ -70,10 +70,11 @@ class Ray:
 		_valid = diff.is_finite() && !diff.is_zero_approx() && _origin.is_finite()
 
 
-
 class Candidate:
-	## The candidate object node
-	var object: Node
+	## Ident of the submitting module
+	var source: StringName
+	## The candidate object
+	var object: Object
 	## Distance between target and pointer
 	var dxy: float
 	## Distance from ray origin to closest ray point
@@ -82,10 +83,11 @@ class Candidate:
 	var userdata: Variant
 
 	func _to_string() -> String:
-		return "Picking.Candidate: object=%s, dxy=%0.2f, dz=%0.2f, userdata=%s" % [ object, dxy, dz, userdata ]
+		return "Picking.Candidate: source='%s', object=%s, dxy=%0.2f, dz=%0.2f, userdata=%s" % [ source, object, dxy, dz, userdata ]
 
-	static func create(p_object: Node, p_dxy: float, p_dz: float, p_userdata: Variant = null) -> Candidate:
+	static func create(p_source: StringName, p_object: Object, p_dxy: float, p_dz: float, p_userdata: Variant = null) -> Candidate:
 		var cand := Candidate.new()
+		cand.source = p_source
 		cand.object = p_object
 		cand.dxy = p_dxy
 		cand.dz = p_dz
@@ -108,8 +110,7 @@ class Query:
 	var _ray: Ray
 	var _candidates: Array[Candidate]
 
-	func submit_candidate_3d(object: Node, dxy: float, dz: float, userdata: Variant = null) -> void:
-		var candidate := Candidate.create(object, dxy, dz, userdata)
+	func submit_candidate(candidate: Candidate) -> void:
 		_candidates.insert(_candidates.bsearch_custom(candidate, Candidate.sort_dxy), candidate)
 
 	## Get the candidates with a dxy score no greater than [param max_dxy].
@@ -129,7 +130,7 @@ class Query:
 		return _candidates.duplicate()
 
 
-signal picked(object: Node)
+signal picked(object: Object)
 signal query_started(query: Query)
 signal query_completed()
 
@@ -145,7 +146,7 @@ var _result: Array[Candidate]
 var _request_update: bool = false
 
 
-func get_object() -> Node:
+func get_object() -> Object:
 	if _result.size():
 		var o := _result[0].object
 		return o if o && !o.is_queued_for_deletion() else null
@@ -217,7 +218,8 @@ func _do_physics_space_3d_query(query: Query) -> void:
 		var target_position: Vector3 = result["position"]
 		var dz := ray.get_depth_closest_to_point(target_position)
 		var dxy := (ray.origin + ray.normal * dz).distance_to(target_position)
-		query.submit_candidate_3d(collider, dxy, dz)
+		var candidate := Candidate.create(&"Physics3DRayQuery", collider, dxy, dz)
+		query.submit_candidate(candidate)
 
 
 func _physics_process(_delta: float):

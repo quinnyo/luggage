@@ -363,12 +363,12 @@ func request_activate_builder(module: int, channel: int, editable: int, priority
 
 ## Returns [code]true[/code] if effective, or [code]false[/code] if nothing happened.
 func pointer_activate() -> bool:
-	if _workspace.is_part_picked():
-		var placement_id := _workspace.get_picked_placement()
-		var part_id := _workspace.placement_get_part_id(placement_id)
-		selection.add(Zed.TYPE_ARMATURE_POINT, part_id, _workspace.placement_get_sub_id(placement_id))
+	var vpp := ViewportPlus.get_viewport_plus(self)
+	var picked := vpp.get_picking().get_object()
+	if picked is Zelection:
+		selection.restore(picked)
 		return true
-	elif _workspace.get_picked_node() == null:
+	else:
 		# only deselect if there is nothing picked & there is something selected!
 		# TODO: active operation/tool should block Zeditor input
 		if !selection.is_empty():
